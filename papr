@@ -1,14 +1,18 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import sys
 import cairo
-from optparse import OptionParser
+import optparse
+import datetime
 import logging
 
 # Constants
 # A4 Width and Height for PDF Surface - 1p = 1/72in
 INCH = 72
-A4_WIDTH = INCH*8.3
-A4_HEIGHT = INCH*11.7
+MM = INCH/25.4
+A4_WIDTH, A4_HEIGHT = INCH*8.3, INCH*11.7
+WEEKDAYS = {1:"Monday", 2:"Tuesday", 3:"Wednesday", 4:"Thursday", 5:"Friday", 6:"Saturday", 7:"Sunday"}
 
 def drawTable(cr, rows, columns, width, height, lineWidth):
 	logging.info("Drawing Table: %s rows, %s columns, %sp height, %sp width, %sp line width",
@@ -30,11 +34,33 @@ def drawTable(cr, rows, columns, width, height, lineWidth):
 def drawDay(cr, x, y, width, height, lineWidth, date):
 	logging.info("drawing Day element: (%s|%s): %s",x, y, date)
 	cr.set_source_rgba(0, 0, 0, 1.0)
-	cr.set_line_width(lineWidth)
+	cr.set_line_width(lineWidth*MM)
+	cr.rectangle(x*MM,y*MM,width*MM,height*MM)
+	cr.stroke()
+
+	cr.set_source_rgb(0, 0, 0)
+	cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+	cr.set_font_size(12)
+	cr.move_to((x+3)*MM,(y+6)*MM)
+	cr.show_text(date)
+
+def drawCalendar(cr):
+	# Creating a new date object with the first day of the current month
+	currentDate = datetime.date(datetime.date.today().year, datetime.date.today().month, 1)
+	logging.debug("Starting Calendar from %s.%s.%s",currentDate.day, currentDate.month, currentDate.year)
+
+	# Defining a one day timedelta object to increase the date object
+	one_day = datetime.timedelta(days=1)
+
+	for i in range(1,5):
+		dayText = "%s, %s" % (currentDate.day, WEEKDAYS[currentDate.isoweekday()])
+		drawDay(cr,10,10*i,50,10,0.6,dayText)
+		currentDate+=one_day
+
 
 def main():
 	# SetUp OptionParser
-	parser = OptionParser()
+	parser = optparse.OptionParser()
 	parser.add_option("-f", "--font", dest="font", 
 					help="select which font to use", default="ostrich-sans")
 	parser.add_option("-o", "--out", dest="out", 
@@ -45,15 +71,17 @@ def main():
 
 	# SetUp Loggin
 	logging.basicConfig(format='%(levelname)s: %(message)s', level=options.log)
-	logging.debug("Option --font=%s", options.font)
-	logging.debug("Option --log=%s", options.log)
-	logging.debug("Option --out=%s", options.out)
-	
-	logging.info("Creating Cario Surface")
-	#surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+
+	# Printing Options for Debugging
+	for option in parser.option_list:
+		if(option.dest != None):
+			logging.debug("%s = %s", option, getattr(options, option.dest))
+	logging.info("Creating Cario Surface and Context")
+	logging.debug("width=%sp, height=%sp", A4_WIDTH, A4_HEIGHT)
 	surface = cairo.PDFSurface(options.out, A4_WIDTH, A4_HEIGHT)
 	cr = cairo.Context(surface)
 
+	drawCalendar(cr)
+
 if __name__ == "__main__":
     sys.exit(main())
-
