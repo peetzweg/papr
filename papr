@@ -4,10 +4,16 @@ import cairo
 from optparse import OptionParser
 import logging
 
+# Constants
+# A4 Width and Height for PDF Surface - 1p = 1/72in
+INCH = 72
+A4_WIDTH = INCH*8.3
+A4_HEIGHT = INCH*11.7
+
 def drawTable(cr, rows, columns, width, height, lineWidth):
 	logging.info("Drawing Table: %s rows, %s columns, %sp height, %sp width, %sp line width",
 					rows, columns, height, width, lineWidth)
-	cr.set_source_rgba(1.0, 1.0, 1.0, 1.0)
+	cr.set_source_rgba(0, 0, 0, 1.0)
 	cr.set_line_width(lineWidth)
 
 	columnWidth = width/columns
@@ -21,13 +27,18 @@ def drawTable(cr, rows, columns, width, height, lineWidth):
 							rowHeight)
 	cr.stroke()
 
+def drawDay(cr, x, y, width, height, lineWidth, date):
+	logging.info("drawing Day element: (%s|%s): %s",x, y, date)
+	cr.set_source_rgba(0, 0, 0, 1.0)
+	cr.set_line_width(lineWidth)
+
 def main():
 	# SetUp OptionParser
 	parser = OptionParser()
 	parser.add_option("-f", "--font", dest="font", 
 					help="select which font to use", default="ostrich-sans")
 	parser.add_option("-o", "--out", dest="out", 
-					help="specify output file", default="pycal.pdf")
+					help="specify output file", default="papr.pdf")
 	parser.add_option("-l", "--log", dest="log", 
 					help="set log level", default="DEBUG")
 	(options, arguments) = parser.parse_args()
@@ -39,15 +50,9 @@ def main():
 	logging.debug("Option --out=%s", options.out)
 	
 	logging.info("Creating Cario Surface")
-	surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+	#surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500)
+	surface = cairo.PDFSurface(options.out, A4_WIDTH, A4_HEIGHT)
 	cr = cairo.Context(surface)
-	
-	width = 50 
-	height = 50
-	lineWidth = 2
-	drawTable(cr, 4, 2, width, height, lineWidth)
-
-	surface.write_to_png('out.png')
 
 if __name__ == "__main__":
     sys.exit(main())
