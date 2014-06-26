@@ -29,7 +29,7 @@ def drawMonthTitle(cr, x, y, width, height, month):
 	cr.show_text(month)
 
 def drawDay(cr, x, y, width, height, lineWidth, dateObject):
-	logging.info("drawing Day element: (%s|%s): %s.%s.%s",x, y, dateObject.day, dateObject.month, dateObject.year)
+	logging.debug("drawing Day element: (%s|%s): %s.%s.%s",x, y, dateObject.day, dateObject.month, dateObject.year)
 
 	# font size in pixels
 	FONTSIZE=12
@@ -46,8 +46,6 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	cr.rectangle(x, y, width, height)
 	cr.stroke()
 	
-	
-
 	# drawing the text
 	cr.set_source_rgb(0, 0, 0)
 	cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
@@ -59,7 +57,7 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	cr.show_text(dayText)
 
 def drawMonth(cr, year, month):
-	logging.debug("drawing %s...", MONTHS[month])
+	logging.info("drawing %s...", MONTHS[month])
 
 	# constants
 	SAFTY = 5*MM
@@ -108,16 +106,17 @@ def drawMonth(cr, year, month):
 			page+=1
 
 def drawCalendar(cr):
-	logging.debug("drawing calendar...")
-
+	today = datetime.date.today() 
+	logging.info("drawing calendar...")
+	logging.info("assuming today is %s.%s.%s",today.day,today.month,today.year)
 	cr.translate(A4_HEIGHT,A4_WIDTH/2)
 	cr.rotate(math.pi)
-	drawMonth(cr,datetime.date.today().year,datetime.date.today().month)
+	drawMonth(cr, today.year, today.month)
 
 	# draw current month
 	cr.translate(A4_HEIGHT, 0)
 	cr.rotate(math.pi)
-	drawMonth(cr,datetime.date.today().year,datetime.date.today().month+1)
+	drawMonth(cr, today.year, today.month+1)
 
 def main():
 	# SetUp OptionParser
@@ -127,11 +126,11 @@ def main():
 	parser.add_option("-o", "--out", dest="out", 
 					help="specify output file", default="papr.pdf")
 	parser.add_option("-l", "--log", dest="log", 
-					help="set log level", default="DEBUG")
+					help="set log level", default="INFO")
 	(options, arguments) = parser.parse_args()
 
 	# SetUp Loggin
-	logging.basicConfig(format='%(levelname)s: %(message)s', level=options.log)
+	logging.basicConfig(format='%(message)s', level=options.log)
 
 	# Printing Options for Debugging
 	for option in parser.option_list:
