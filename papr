@@ -33,12 +33,20 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 
 	# font size in pixels
 	FONTSIZE=12
-	
+
+	# fill box if weekend
+	if(dateObject.isoweekday() >= 6):
+		cr.rectangle(x, y, width, height)
+		cr.set_source_rgba(0.95, 0.95, 0.95, 1.0)
+		cr.fill()
+
 	# drawing the box
 	cr.set_source_rgba(0, 0, 0, 1.0)
 	cr.set_line_width(lineWidth)
 	cr.rectangle(x, y, width, height)
 	cr.stroke()
+	
+	
 
 	# drawing the text
 	cr.set_source_rgb(0, 0, 0)
@@ -107,7 +115,7 @@ def drawCalendar(cr):
 	drawMonth(cr,datetime.date.today().year,datetime.date.today().month)
 
 	# draw current month
-	cr.translate(A4_HEIGHT,0)
+	cr.translate(A4_HEIGHT, 0)
 	cr.rotate(math.pi)
 	drawMonth(cr,datetime.date.today().year,datetime.date.today().month+1)
 
