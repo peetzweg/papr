@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import math
 import cairo
 import optparse
 import datetime
@@ -11,40 +12,40 @@ import logging
 # A4 Width and Height for PDF Surface - 1p = 1/72in
 INCH = 72
 MM = INCH/25.4
+CM = INCH/2.54
 A4_WIDTH, A4_HEIGHT = INCH*8.3, INCH*11.7
 WEEKDAYS = {1:"Monday", 2:"Tuesday", 3:"Wednesday", 4:"Thursday", 5:"Friday", 6:"Saturday", 7:"Sunday"}
 
-def drawTable(cr, rows, columns, width, height, lineWidth):
-	logging.info("Drawing Table: %s rows, %s columns, %sp height, %sp width, %sp line width",
-					rows, columns, height, width, lineWidth)
-	cr.set_source_rgba(0, 0, 0, 1.0)
-	cr.set_line_width(lineWidth)
-
-	columnWidth = width/columns
-	rowHeight = height/rows
-
-	for r in range(0, rows):
-		for c in range(0, columns):
-			cr.rectangle(c*columnWidth+(lineWidth/2), \
-							r*rowHeight+(lineWidth/2), \
-							columnWidth, \
-							rowHeight)
-	cr.stroke()
+# Maybe also include short form, but auto generate with substring instead of hard coded
+#WEEKDAYS_SHORT = {1:"Mon", 2:"Tue", 3:"Wed", 4:"Thu", 5:"Fri", 6:"Sat", 7:"Sun"}
 
 def drawDay(cr, x, y, width, height, lineWidth, date):
 	logging.info("drawing Day element: (%s|%s): %s",x, y, date)
+
+	# font size in pixels
+	FONTSIZE=12
+	
+	# drawing the box
 	cr.set_source_rgba(0, 0, 0, 1.0)
-	cr.set_line_width(lineWidth*MM)
-	cr.rectangle(x*MM,y*MM,width*MM,height*MM)
+	cr.set_line_width(lineWidth)
+	cr.rectangle(x, y, width, height)
 	cr.stroke()
 
+	# drawing the text
 	cr.set_source_rgb(0, 0, 0)
-	cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+	cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 	cr.set_font_size(12)
-	cr.move_to((x+3)*MM,(y+6)*MM)
+	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE*0.3333),FONTSIZE 
+	cr.move_to((x+OFFSET_X), (y+OFFSET_Y))
 	cr.show_text(date)
 
+
 def drawCalendar(cr):
+	# constants
+	SAFTY = 5*MM
+	P_WIDTH, P_HEIGHT = 6.425*CM, 9.5*CM
+	D_WIDTH, D_HEIGHT = 3.2125*CM, 2.375*CM
+
 	# Creating a new date object with the first day of the current month
 	currentDate = datetime.date(datetime.date.today().year, datetime.date.today().month, 1)
 	logging.debug("Starting Calendar from %s.%s.%s",currentDate.day, currentDate.month, currentDate.year)
@@ -52,10 +53,14 @@ def drawCalendar(cr):
 	# Defining a one day timedelta object to increase the date object
 	one_day = datetime.timedelta(days=1)
 
-	for i in range(1,5):
+	for i in range(0,8):
 		dayText = "%s, %s" % (currentDate.day, WEEKDAYS[currentDate.isoweekday()])
-		drawDay(cr,10,10*i,50,10,0.6,dayText)
-		currentDate+=one_day
+		row=math.floor(i/2)
+		if(i%2==0):
+			drawDay(cr,SAFTY , SAFTY+(row*D_HEIGHT), D_WIDTH,D_HEIGHT, 0.6, dayText)
+		else:
+			drawDay(cr,SAFTY+D_WIDTH , SAFTY+(row*D_HEIGHT), D_WIDTH,D_HEIGHT, 0.6, dayText)
+		currentDate += one_day
 
 
 def main():
@@ -77,8 +82,8 @@ def main():
 		if(option.dest != None):
 			logging.debug("%s = %s", option, getattr(options, option.dest))
 	logging.info("Creating Cario Surface and Context")
-	logging.debug("width=%sp, height=%sp", A4_WIDTH, A4_HEIGHT)
-	surface = cairo.PDFSurface(options.out, A4_WIDTH, A4_HEIGHT)
+	logging.debug("width=%sp/%scm, height=%sp/%scm", A4_HEIGHT, A4_HEIGHT/CM, A4_WIDTH, A4_WIDTH/CM)
+	surface = cairo.PDFSurface(options.out, A4_HEIGHT,A4_WIDTH)
 	cr = cairo.Context(surface)
 
 	drawCalendar(cr)
