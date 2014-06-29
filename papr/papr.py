@@ -39,12 +39,12 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	cr.set_line_width(lineWidth)
 	cr.rectangle(x, y, width, height)
 	cr.stroke()
-	
+
 	# drawing the text
 	cr.set_source_rgb(0, 0, 0)
 	cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 	cr.set_font_size(10)
-	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE*0.3333),FONTSIZE 
+	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE*0.3333),FONTSIZE
 	cr.move_to((x+OFFSET_X), (y+OFFSET_Y))
 
 	dayText = "%s %s" % (dateObject.day, dateObject.strftime("%A"))
@@ -63,10 +63,10 @@ def drawMonth(cr, year, month):
 
 	# Defining a one day timedelta object to increase the date object
 	one_day = datetime.timedelta(days=1)
-	
+
 	# draw month name in first cell
 	drawMonthTitle(cr, SAFTY, SAFTY, CELL_WIDTH, CELL_HEIGHT, date)
-	
+
 	cellsOnPage = 1
 	cellsOnPageMax = 8
 	page = 0
@@ -77,7 +77,7 @@ def drawMonth(cr, year, month):
 		# positions on page
 		x=SAFTY+(page*PAGE_WIDTH)
 		y=SAFTY+(row*CELL_HEIGHT)
-		
+
 		# add cell width if date is odd
 		if(date.day%2!=0):
 			x += CELL_WIDTH
@@ -99,7 +99,7 @@ def drawMonth(cr, year, month):
 			page+=1
 
 def drawCalendar(cr):
-	today = datetime.date.today() 
+	today = datetime.date.today()
 	logging.info("drawing calendar...")
 	logging.info("assuming today is %s.%s.%s",today.day,today.month,today.year)
 
@@ -116,15 +116,15 @@ def drawCalendar(cr):
 def main():
 	# SetUp OptionParser
 	parser = optparse.OptionParser()
-	parser.add_option("-o", "--out", dest="out", 
+	parser.add_option("-o", "--out", dest="out",
 					help="specify output file", default="papr.pdf")
-	parser.add_option("-l", "--locale", 
+	parser.add_option("-l", "--locale",
 					help="choose lacal to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
-	parser.add_option("-a", "--abbreviation", action="store_false", 
+	parser.add_option("-a", "--abbreviation", action="store_false",
 					help="use abbreviations of months and weekdays", default=False)
-	parser.add_option("-v", "--verbose", action="store_true", 
+	parser.add_option("-v", "--verbose", action="store_true",
 					help="print status messages to stdout", default=False)
-	parser.add_option("-d", "--debug", action="store_true", 
+	parser.add_option("-d", "--debug", action="store_true",
 					help="print status and debug messages to stdout", default=False)
 	(options, arguments) = parser.parse_args()
 
