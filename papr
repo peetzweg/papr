@@ -5,6 +5,8 @@ import sys
 import locale
 import math
 import cairo
+import pango
+import pangocairo
 import optparse
 import datetime
 import logging
@@ -16,13 +18,31 @@ MM = INCH/25.4
 CM = INCH/2.54
 A4_WIDTH, A4_HEIGHT = INCH*8.3, INCH*11.7
 
-def drawMonthTitle(cr, x, y, width, height, dateObject):
-	cr.set_source_rgb(0, 0, 0)
-	cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-	cr.set_font_size(height/2)
+# Options
+ABBRIVIATE = False
 
-	cr.move_to(x, y+(height/2))
-	cr.show_text(dateObject.strftime("%B"))
+def drawText(cr, text, x, y, fontSize):
+	cr.move_to(x, y)
+	pc = pangocairo.CairoContext(cr)
+	pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
+
+	layout = pc.create_layout()
+	font = pango.FontDescription("Monaco %s" % fontSize)
+	layout.set_font_description(font)
+
+	layout.set_text(text)
+	cr.set_source_rgb(0, 0, 0)
+	pc.update_layout(layout)
+	pc.show_layout(layout)
+
+def drawMonthTitle(cr, x, y, width, height, dateObject):
+#	cr.move_to(x, y+(height/2))
+	style = "%B"
+	if(ABBRIVIATE):
+		style="%b"
+	monthString = dateObject.strftime(style)
+	drawText(cr,monthString, x, y, math.floor(height/3))
+
 
 def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	# font size in pixels
@@ -46,9 +66,12 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	cr.set_font_size(10)
 	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE*0.3333),FONTSIZE 
 	cr.move_to((x+OFFSET_X), (y+OFFSET_Y))
-
-	dayText = "%s %s" % (dateObject.day, dateObject.strftime("%A"))
-	cr.show_text(dayText)
+	
+	style = "%A"
+	if(ABBRIVIATE):
+		style = "%a"
+	dayString = "%s %s" % (dateObject.day, dateObject.strftime(style))
+	cr.show_text(dayString)
 
 def drawMonth(cr, year, month):
 	# constants
@@ -120,7 +143,7 @@ def main():
 					help="specify output file", default="papr.pdf")
 	parser.add_option("-l", "--locale", 
 					help="choose lacal to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
-	parser.add_option("-a", "--abbreviation", action="store_false", 
+	parser.add_option("-a", "--abbreviate", action="store_true", 
 					help="use abbreviations of months and weekdays", default=False)
 	parser.add_option("-v", "--verbose", action="store_true", 
 					help="print status messages to stdout", default=False)
@@ -146,8 +169,18 @@ def main():
 		logging.error("Unsupported locale:'%s'!\nList all supported locales with 'locale -a'",options.locale)
 		sys.exit(1)
 
+	# Set global variables
+	if(options.abbreviate):
+		logging.debug("setting ABBRIVATE to True")
+		global ABBRIVIATE
+		ABBRIVIATE = True
+
+	# listing font names
+	font_map = pangocairo.cairo_font_map_get_default()
+	print [f.get_name() for f in   font_map.list_families()]
+
 	logging.debug("Creating Cario Surface and Context")
-	logging.debug("width=%sp/%scm, height=%sp/%scm", A4_HEIGHT, A4_HEIGHT/CM, A4_WIDTH, A4_WIDTH/CM)
+	logging.debug("width = %sp/%scm, height = %sp/%scm", A4_HEIGHT, A4_HEIGHT/CM, A4_WIDTH, A4_WIDTH/CM)
 	surface = cairo.PDFSurface(options.out, A4_HEIGHT, A4_WIDTH)
 	cr = cairo.Context(surface)
 
