@@ -16,13 +16,13 @@ MM = INCH/25.4
 CM = INCH/2.54
 A4_WIDTH, A4_HEIGHT = INCH*8.3, INCH*11.7
 
-def drawMonthTitle(cr, x, y, width, height, date):
+def drawMonthTitle(cr, x, y, width, height, dateObject):
 	cr.set_source_rgb(0, 0, 0)
 	cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 	cr.set_font_size(height/2)
 
 	cr.move_to(x, y+(height/2))
-	cr.show_text(date.strftime("%B"))
+	cr.show_text(dateObject.strftime("%B"))
 
 def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	# font size in pixels
