@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import locale
 import math
 import cairo
 import optparse
@@ -14,23 +15,16 @@ INCH = 72
 MM = INCH/25.4
 CM = INCH/2.54
 A4_WIDTH, A4_HEIGHT = INCH*8.3, INCH*11.7
-WEEKDAYS = {1:"Monday", 2:"Tuesday", 3:"Wednesday", 4:"Thursday", 5:"Friday", 6:"Saturday", 7:"Sunday"}
-MONTHS = {1:"January", 2:"February", 3:"March", 4:"April", 5:"May", 6:"June", 7:"July", 8:"August", 9:"September", 10:"October", 11:"November", 12:"December"}
 
-# Maybe also include short form, but auto generate with substring instead of hard coded
-#WEEKDAYS_SHORT = {1:"Mon", 2:"Tue", 3:"Wed", 4:"Thu", 5:"Fri", 6:"Sat", 7:"Sun"}
-
-def drawMonthTitle(cr, x, y, width, height, month):
+def drawMonthTitle(cr, x, y, width, height, date):
 	cr.set_source_rgb(0, 0, 0)
 	cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 	cr.set_font_size(height/2)
 
 	cr.move_to(x, y+(height/2))
-	cr.show_text(month)
+	cr.show_text(date.strftime("%B"))
 
 def drawDay(cr, x, y, width, height, lineWidth, dateObject):
-	#logging.debug("drawing Day element: (%s|%s): %s.%s.%s",x, y, dateObject.day, dateObject.month, dateObject.year)
-
 	# font size in pixels
 	FONTSIZE=12
 
@@ -53,12 +47,10 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE*0.3333),FONTSIZE 
 	cr.move_to((x+OFFSET_X), (y+OFFSET_Y))
 
-	dayText = "%s %s" % (dateObject.day, WEEKDAYS[dateObject.isoweekday()])
+	dayText = "%s %s" % (dateObject.day, dateObject.strftime("%A"))
 	cr.show_text(dayText)
 
 def drawMonth(cr, year, month):
-	logging.info("drawing %s...", MONTHS[month])
-
 	# constants
 	SAFTY = 5*MM
 	PAGE_WIDTH = 7.425*CM
@@ -67,12 +59,13 @@ def drawMonth(cr, year, month):
 
 	# Creating a new date object with the first day of the month to draw
 	date = datetime.date(year, month, 1)
+	logging.info("drawing %s...", date.strftime("%B"))
 
 	# Defining a one day timedelta object to increase the date object
 	one_day = datetime.timedelta(days=1)
 	
 	# draw month name in first cell
-	drawMonthTitle(cr, SAFTY, SAFTY, CELL_WIDTH, CELL_HEIGHT, MONTHS[date.month])
+	drawMonthTitle(cr, SAFTY, SAFTY, CELL_WIDTH, CELL_HEIGHT, date)
 	
 	cellsOnPage = 1
 	cellsOnPageMax = 8
@@ -125,6 +118,8 @@ def main():
 	parser = optparse.OptionParser()
 	parser.add_option("-o", "--out", dest="out", 
 					help="specify output file", default="papr.pdf")
+	parser.add_option("-l", "--locale", 
+					help="choose lacal to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
 	parser.add_option("-a", "--abbreviation", action="store_false", 
 					help="use abbreviations of months and weekdays", default=False)
 	parser.add_option("-v", "--verbose", action="store_true", 
@@ -132,7 +127,6 @@ def main():
 	parser.add_option("-d", "--debug", action="store_true", 
 					help="print status and debug messages to stdout", default=False)
 	(options, arguments) = parser.parse_args()
-
 
 	# defining output
 	if(options.debug):
@@ -144,6 +138,14 @@ def main():
 	elif(options.verbose):
 		logging.basicConfig(format='%(message)s', level="INFO")
 
+	# setting locale
+	try:
+		logging.debug("setting locale to '%s'", options.locale)
+		locale.setlocale(locale.LC_ALL, options.locale)
+	except locale.Error:
+		logging.error("Unsupported locale:'%s'!\nList all supported locales with 'locale -a'",options.locale)
+		sys.exit(1)
+
 	logging.debug("Creating Cario Surface and Context")
 	logging.debug("width=%sp/%scm, height=%sp/%scm", A4_HEIGHT, A4_HEIGHT/CM, A4_WIDTH, A4_WIDTH/CM)
 	surface = cairo.PDFSurface(options.out, A4_HEIGHT, A4_WIDTH)
@@ -151,6 +153,8 @@ def main():
 
 	drawCalendar(cr)
 	logging.info("Finished drawing Calendar!")
+
+	return 0
 
 if __name__ == "__main__":
     sys.exit(main())
