@@ -27,7 +27,7 @@ def drawText(cr, text, x, y, fontSize):
 	pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
 
 	layout = pc.create_layout()
-	font = pango.FontDescription("Monaco %s" % fontSize)
+	font = pango.FontDescription("%s %s" % (g_options.font, fontSize))
 	layout.set_font_description(font)
 
 	layout.set_text(text)
@@ -62,7 +62,7 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 
 	# drawing the text
 	cr.set_source_rgb(0, 0, 0)
-	cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+	cr.select_font_face(g_options.font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 	cr.set_font_size(10)
 	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE*0.3333),FONTSIZE
 	cr.move_to((x+OFFSET_X), (y+OFFSET_Y))
