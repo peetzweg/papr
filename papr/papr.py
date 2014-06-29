@@ -18,8 +18,8 @@ MM = INCH/25.4
 CM = INCH/2.54
 A4_WIDTH, A4_HEIGHT = INCH*8.3, INCH*11.7
 
-# Options
-ABBRIVIATE = False
+# Global variables for g_options
+g_options = False
 
 def drawText(cr, text, x, y, fontSize):
 	cr.move_to(x, y)
@@ -38,7 +38,7 @@ def drawText(cr, text, x, y, fontSize):
 def drawMonthTitle(cr, x, y, width, height, dateObject):
 #	cr.move_to(x, y+(height/2))
 	style = "%B"
-	if(ABBRIVIATE):
+	if(g_options.abbreviate):
 		style="%b"
 	monthString = dateObject.strftime(style)
 	drawText(cr,monthString, x, y, math.floor(height/3))
@@ -68,7 +68,7 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	cr.move_to((x+OFFSET_X), (y+OFFSET_Y))
 	
 	style = "%A"
-	if(ABBRIVIATE):
+	if(g_options.abbreviate):
 		style = "%a"
 	dayString = "%s %s" % (dateObject.day, dateObject.strftime(style))
 	cr.show_text(dayString)
@@ -142,46 +142,46 @@ def main():
 	parser.add_option("-o", "--out", dest="out",
 					help="specify output file", default="papr.pdf")
 	parser.add_option("-l", "--locale",
-					help="choose lacal to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
+					help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
 	parser.add_option("-a", "--abbreviate", action="store_true", 
 					help="use abbreviations of months and weekdays", default=False)
+	parser.add_option("-f", "--font",
+					help="choose which font to use", default="Sans")
 	parser.add_option("-v", "--verbose", action="store_true",
 					help="print status messages to stdout", default=False)
 	parser.add_option("-d", "--debug", action="store_true",
 					help="print status and debug messages to stdout", default=False)
-	(options, arguments) = parser.parse_args()
+	global g_options
+	(g_options, arguments) = parser.parse_args()
 
 	# defining output
-	if(options.debug):
+	if(g_options.debug):
 		logging.basicConfig(format='%(message)s', level="DEBUG")
 		# Printing Options for Debugging
 		for option in parser.option_list:
 			if(option.dest != None):
-				logging.debug("%s = %s", option, getattr(options, option.dest))
-	elif(options.verbose):
+				logging.debug("%s = %s", option, getattr(g_options, option.dest))
+	elif(g_options.verbose):
 		logging.basicConfig(format='%(message)s', level="INFO")
 
 	# setting locale
 	try:
-		logging.debug("setting locale to '%s'", options.locale)
-		locale.setlocale(locale.LC_ALL, options.locale)
+		logging.debug("setting locale to '%s'", g_options.locale)
+		locale.setlocale(locale.LC_ALL, g_options.locale)
 	except locale.Error:
-		logging.error("Unsupported locale:'%s'!\nList all supported locales with 'locale -a'",options.locale)
+		logging.error("Unsupported locale: '%s'!\nList all supported locales with 'locale -a'",g_options.locale)
 		sys.exit(1)
 
-	# Set global variables
-	if(options.abbreviate):
-		logging.debug("setting ABBRIVATE to True")
-		global ABBRIVIATE
-		ABBRIVIATE = True
-
-	# listing font names
+	# check if selected font is available
 	font_map = pangocairo.cairo_font_map_get_default()
-	print [f.get_name() for f in   font_map.list_families()]
+	if(g_options.font not in [f.get_name() for f in   font_map.list_families()]):
+		logging.error("Unsupported font: '%s'!\nInstalled fonts are:\n%s", g_options.font, [f.get_name() for f in   font_map.list_families()])
+		sys.exit(1)
+
 
 	logging.debug("Creating Cario Surface and Context")
 	logging.debug("width = %sp/%scm, height = %sp/%scm", A4_HEIGHT, A4_HEIGHT/CM, A4_WIDTH, A4_WIDTH/CM)
-	surface = cairo.PDFSurface(options.out, A4_HEIGHT, A4_WIDTH)
+	surface = cairo.PDFSurface(g_options.out, A4_HEIGHT, A4_WIDTH)
 	cr = cairo.Context(surface)
 
 	drawCalendar(cr)
