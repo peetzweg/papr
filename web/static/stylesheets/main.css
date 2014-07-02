@@ -1,0 +1,30 @@
+body {
+    font-family: carme, sans-serif;
+            font-size: 100%;
+}
+
+h1 {
+}
+
+#container {
+    margin: 20px;
+    margin-top: 50px;
+}
+
+#content img {
+    margin-bottom: 50px;
+}
+
+#sidebar {
+    margin-bottom: 50px;
+}
+
+#menu {
+    list-style-type: none;  
+    margin: 0;
+    padding: 0;
+}
+
+#menu li {
+    margin-bottom: 10px; 
+}
