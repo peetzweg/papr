@@ -5,7 +5,18 @@ body {
 
 #logo {
     width: 100px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 50px;
+}
+
+h2 {
+    margin-top: 50px;
 }
 
 #container {
@@ -17,7 +28,24 @@ body {
     margin-right: 10px;
 }
 
-#sidebar {
+// Sidebar
+
+a {
+    text-decoration: none;
+}
+
+a:link {
+    text-decoration: none;
+    color: #666;
+}
+
+a:visited {
+    text-decoration: none;
+    color: #666;
+}
+
+a:hover {
+    color: #000;
 }
 
 #menu {
@@ -27,5 +55,10 @@ body {
 }
 
 #menu li {
-    margin-bottom: 25px; 
+    height: 20px;
+    width: 180px;
+    margin-bottom: 20px; 
+    padding-bottom: 10px;
+    cursor: pointer;
 }
+

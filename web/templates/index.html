@@ -1,64 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta http-equiv="x-ua-compatible" content="ie=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-<title>One Sheet Calendar</title>
-<link rel="stylesheet" href="static/stylesheets/main.css" />
+{% extends "layout.html" %}
+{% block content %}
+<span id="top"/>
+<img width="100%" src="/static/images/calendar.jpg"></img>
 
-<script src="//use.edgefonts.net/karla;carme.js"></script>
+<span class="section" id="about_anchor">
+<h2>About</h2>
+<p>We are doing this calendar stuff.</p>
+</span>
 
-    <!-- the important styles are below... -->
-		<style>
-			#container {overflow: hidden;}
-			#sidebar {width:284px; float:left; }
+<span class="section" id="download_anchor">
+<h2>Create Calendar</h2>
 
-			#portamento_container {float:left; position:relative;} /* take the positioning of the sidebar, and become the start point for the sidebar positioning */
-			#portamento_container #sidebar {float:none; position:absolute;} /* no need to float anymore, become absolutely positoned */
-			#portamento_container #sidebar.fixed {position:fixed;} /* if the panel is sliding, it needs position:fixed */
-		</style>
-	
-<!--[if lt IE 9]>
-  <script src="./static/javascripts/html5.js"></script>
-<![endif]-->
-<!--[if (gt IE 8) | (IEMobile)]><!-->
-  <link rel="stylesheet" href="./static/stylesheets/unsemantic-grid-responsive.css" />
-<!--<![endif]-->
-<!--[if (lt IE 9) & (!IEMobile)]>
-  <link rel="stylesheet" href="./static/stylesheets/ie.css" />
-<![endif]-->
+<p>Choose your options and download the PDF.</p>
+<p>
+    <form>
+       <fieldset>
+          <legend>Settings</legend>
+          <p>
+             <label>Select language</label>
+             <select id = "myList">
+               <option value = "1">one</option>
+               <option value = "2">two</option>
+               <option value = "3">three</option>
+               <option value = "4">four</option>
+             </select>
+          </p>
+          <p>
+             <label>First month</label>
+             <select id = "myList">
+               <option value = "1">one</option>
+               <option value = "2">two</option>
+               <option value = "3">three</option>
+               <option value = "4">four</option>
+             </select>
+          </p>
+      </fieldset>
+      <p>
+      <input value="Download PDF" type="button"/>
+      </p>
+    </form>
+</p>
+</span>
 
-<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<span class="section" id="terminal_anchor">
+<h2>Terminal Application</h2>
 
-</head>
-<body>
-  <div class="grid-container" id="container">
-    <div class="grid-25 hide-on-mobile" id="sidebar">
-        <img id="logo" src="./static/images/calendarLogo.svg"/>
-        <ul id="menu">
-            <li><i class="fa fa-question fa-lg"></i> about</li>
-            <li><i class="fa fa-download fa-lg"></i> create calendar</li>
-                        <li><i class="fa fa-terminal fa-lg"></i> terminal application </li>
-            <li><i class="fa fa-github-alt fa-lg"></i> contribute</li>
+<p>FoldedCalendar was intended to be a console terminal application. It is open source and you can still use it on the command line.</p>
+</span>
 
-            <li><i class="fa fa-btc fa-lg"></i> donate</li>
+<span class="section" id="contribute_anchor">
+<h2>Contribute</h2>
 
-        </ul>
-    </div>
-    <div class="mobile-grid-100 hide-on-desktop" id="sidebar_mobile">
-    mobile
+<p>Contribute some source code or add some new themes to FoldedCalendar to make it even more awesome. </p>
+</span>
 
-    </div>
-    <div class="grid-75 mobile-grid-100" id="content">
-        <img width="100%" src="static/images/calendar.jpg"/>
-    </div>
-    </div>
+<span class="section" id="donate_anchor">
+<h2>Donate</h2>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
-	<script src="./static/javascripts/portamento.js"></script>		
-	<script>
-		$('#sidebar').portamento({gap: 50});	// set a 100px gap rather than the default 10px
-	</script>
-</body>
+<p>Whats the best nation? The donation. Donate bitcoins so we continue liking you.</p>
 
+<p><img src="./static/images/donation.png"/></p>
+</span>
+
+{% endblock %}

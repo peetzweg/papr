@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="x-ua-compatible" content="ie=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+<title>One Sheet Calendar</title>
+<link rel="stylesheet" href="static/stylesheets/main.css" />
+
+    <meta name="author" content="Philip Poloczek, Jendrik Poloczek"/>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/static/images/favicon.ico"/>
+    
+    <!-- Touch Icons -->
+    <link rel="apple-touch-icon-precomposed" href="/static/images/touch-icon-iphone.png"/>
+    <link rel="apple-touch-icon" href="/static/images/touch-icon-iphone.png"/>
+    <link rel="apple-touch-icon" sizes="76x76" href="/static/images/touch-icon-ipad.png"/>
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/images/touch-icon-iphone-retina.png"/>
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/images/touch-icon-ipad-retina.png"/>
+ 
+    <!-- font -->
+    <script src="//use.edgefonts.net/karla;carme.js"></script>
+
+    <!-- the important styles are below... -->
+		<style>
+			#container {overflow: hidden;}
+			#sidebar {width:284px; float:left; }
+
+			#portamento_container {float:left; position:relative;} /* take the positioning of the sidebar, and become the start point for the sidebar positioning */
+			#portamento_container #sidebar {float:none; position:absolute;} /* no need to float anymore, become absolutely positoned */
+			#portamento_container #sidebar.fixed {position:fixed;} /* if the panel is sliding, it needs position:fixed */
+		</style>
+	
+<!--[if lt IE 9]>
+  <script src="./static/javascripts/html5.js"></script>
+<![endif]-->
+<!--[if (gt IE 8) | (IEMobile)]><!-->
+  <link rel="stylesheet" href="./static/stylesheets/unsemantic-grid-responsive.css" />
+<!--<![endif]-->
+<!--[if (lt IE 9) & (!IEMobile)]>
+  <link rel="stylesheet" href="./static/stylesheets/ie.css" />
+<![endif]-->
+
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+<script src="./static/javascripts/smooth-scroll.js"></script>
+</head>
+<body id="main">
+  <div class="grid-container" id="container">
+    <div class="grid-25 hide-on-mobile" id="sidebar">
+            <a data-scroll href="#main"><img id="logo" src="./static/images/calendarLogo.svg"/></a>
+        <h1>FoldedCalendar</h1>
+        <ul id="menu">
+                <a data-scroll href="#about_anchor"><li><i class="fa fa-question fa-lg"></i>about</li></a>
+                <a data-scroll href="#download_anchor"><li><i class="fa fa-download fa-lg"></i>create calendar</li></a>
+                <a data-scroll href="#terminal_anchor"><li><i class="fa fa-terminal fa-lg"></i>terminal application </li></a>
+                <a data-scroll href="#contribute_anchor"><li><i class="fa fa-github-alt fa-lg"></i>contribute</li></a>
+                <a data-scroll href="#donate_anchor"><li><i class="fa fa-btc fa-lg"></i>donate</li></a>
+
+        </ul>
+    </div>
+    <div class="mobile-grid-100 hide-on-desktop" id="sidebar_mobile">
+    mobile
+
+    </div>
+    <div class="grid-75 mobile-grid-100" id="content">
+        {% block content %} {% endblock %}
+    </div>
+    </div>
+
+    <script>
+        smoothScroll.init();
+    </script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script src="./static/javascripts/portamento.js"></script>	
+
+    <script>
+		$('#sidebar').portamento({gap: 50});	// set a 100px gap rather than the default 10px
+	</script>
+</body>
+

@@ -163,7 +163,7 @@
 		}
 		
 		// wrap the floating panel in a div, then set a sensible min-height and width
-		panel.wrap('<div id="portamento_container" />');
+		panel.wrap('<div id="portamento_container" class="hide-on-mobile" />');
 		var float_container = $('#portamento_container');
 		float_container.css({
 			'min-height': panel.outerHeight(),
