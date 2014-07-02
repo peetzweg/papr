@@ -3,20 +3,21 @@ body {
             font-size: 100%;
 }
 
-h1 {
+#logo {
+    width: 100px;
+    margin-bottom: 30px;
 }
 
 #container {
-    margin: 20px;
+    margin: 5%;
     margin-top: 50px;
 }
 
-#content img {
-    margin-bottom: 50px;
+.fa {
+    margin-right: 10px;
 }
 
 #sidebar {
-    margin-bottom: 50px;
 }
 
 #menu {
@@ -26,5 +27,5 @@ h1 {
 }
 
 #menu li {
-    margin-bottom: 10px; 
+    margin-bottom: 25px; 
 }
