@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="PaprLogo.svg">
+   sodipodi:docname="calendarLogo.svg">
   <defs
      id="defs4">
     <linearGradient
@@ -250,9 +250,9 @@
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:snap-global="true"
-     inkscape:window-width="958"
-     inkscape:window-height="1048"
-     inkscape:window-x="960"
+     inkscape:window-width="1366"
+     inkscape:window-height="738"
+     inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1">
     <inkscape:grid
@@ -271,7 +271,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -280,29 +280,25 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-552.36217)">
-    <g
-       id="g4093"
-       transform="matrix(2.7777778,0,0,2.7777778,0,-1606.492)">
-      <path
-         id="path4018"
-         d="M 8.0625,778.59375 C 3.2872336,780.87921 0,785.74021 0,791.40625 l 0,151.5625 c 0,7.87263 6.3461183,14.21875 14.21875,14.21875 l 151.5625,0 c 7.87263,0 14.21875,-6.34612 14.21875,-14.21875 l 0,-134.0625 -171.9375,-30.3125 z"
-         style="fill:#eeeeee;fill-opacity:1;stroke:none"
-         inkscape:connector-curvature="0" />
-      <path
-         id="path4020"
-         d="M 180,808.90625 0,840.625 0,942.96875 c 0,7.87263 6.3461183,14.21875 14.21875,14.21875 l 151.5625,0 c 7.87263,0 14.21875,-6.34612 14.21875,-14.21875 l 0,-134.0625 z"
-         style="fill:url(#linearGradient4101);fill-opacity:1;stroke:none"
-         inkscape:connector-curvature="0" />
-      <path
-         id="path4022"
-         d="m 0,840.625 0,102.34375 c 0,7.87263 6.3461183,14.21875 14.21875,14.21875 l 151.5625,0 c 7.87263,0 14.21875,-6.34612 14.21875,-14.21875 l 0,-70.625 L 0,840.625 z"
-         style="fill:url(#linearGradient4103);fill-opacity:1;stroke:none"
-         inkscape:connector-curvature="0" />
-      <path
-         id="path4024"
-         d="m 180,872.375 -180,31.71875 0,38.875 c 0,7.87263 6.3461183,14.21875 14.21875,14.21875 l 151.5625,0 c 7.87263,0 14.21875,-6.34612 14.21875,-14.21875 l 0,-70.59375 z"
-         style="fill:url(#linearGradient4105);fill-opacity:1;stroke:none"
-         inkscape:connector-curvature="0" />
-    </g>
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#eeeeee;fill-opacity:1;stroke:none"
+       d="M 22.395834,556.26843 C 9.1312045,562.61693 0,576.11971 0,591.85871 l 0,421.00699 c 0,21.8684 17.628107,39.4965 39.496528,39.4965 l 421.006952,0 c 21.86841,0 39.49652,-17.6281 39.49652,-39.4965 L 500,640.46982 22.395834,556.26843 z"
+       id="path4018" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#aaaaaa;fill-opacity:1;stroke:none"
+       d="M 500,640.46982 0,728.57746 0,1012.8657 c 0,21.8684 17.628107,39.4965 39.496528,39.4965 l 421.006952,0 c 21.86841,0 39.49652,-17.6281 39.49652,-39.4965 l 0,-372.39588 z"
+       id="path4020" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#cccccf;fill-opacity:1;stroke:none"
+       d="m 0,728.57746 0,284.28824 c 0,21.8684 17.628107,39.4965 39.496528,39.4965 l 421.006952,0 c 21.86841,0 39.49652,-17.6281 39.49652,-39.4965 L 500,816.6851 0,728.57746 z"
+       id="path4022" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#888888;fill-opacity:1;stroke:none"
+       d="M 500,816.77191 0,904.87955 0,1012.8657 c 0,21.8684 17.628107,39.4965 39.496528,39.4965 l 421.006952,0 c 21.86841,0 39.49652,-17.6281 39.49652,-39.4965 l 0,-196.09379 z"
+       id="path4024" />
   </g>
 </svg>
