@@ -121,7 +121,12 @@ def drawMonth(cr, year, month):
 			# increment page counter
 			page+=1
 
-def drawCalendar(cr):
+def drawCalendar():
+	logging.debug("Creating Cario Surface and Context")
+	logging.debug("width = %sp/%scm, height = %sp/%scm", A4_HEIGHT, A4_HEIGHT/CM, A4_WIDTH, A4_WIDTH/CM)
+	surface = cairo.PDFSurface(g_options.out, A4_HEIGHT, A4_WIDTH)
+	cr = cairo.Context(surface)
+
 	today = datetime.date.today()
 	logging.info("drawing calendar...")
 	logging.info("assuming today is %s.%s.%s",today.day,today.month,today.year)
@@ -135,6 +140,8 @@ def drawCalendar(cr):
 	cr.translate(A4_HEIGHT, 0)
 	cr.rotate(math.pi)
 	drawMonth(cr, today.year, today.month+1)
+
+	logging.info("Finished drawing Calendar!")
 
 def main():
 	# SetUp OptionParser
@@ -178,14 +185,7 @@ def main():
 		logging.error("Unsupported font: '%s'!\nInstalled fonts are:\n%s", g_options.font, [f.get_name() for f in   font_map.list_families()])
 		sys.exit(1)
 
-
-	logging.debug("Creating Cario Surface and Context")
-	logging.debug("width = %sp/%scm, height = %sp/%scm", A4_HEIGHT, A4_HEIGHT/CM, A4_WIDTH, A4_WIDTH/CM)
-	surface = cairo.PDFSurface(g_options.out, A4_HEIGHT, A4_WIDTH)
-	cr = cairo.Context(surface)
-
-	drawCalendar(cr)
-	logging.info("Finished drawing Calendar!")
+	drawCalendar()
 
 	return 0
 
