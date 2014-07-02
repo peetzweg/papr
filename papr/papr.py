@@ -14,9 +14,9 @@ import logging
 # Constants
 # A4 Width and Height for PDF Surface - 1p = 1/72in
 INCH = 72
-MM = INCH/25.4
-CM = INCH/2.54
-A4_WIDTH, A4_HEIGHT = INCH*8.3, INCH*11.7
+MM = INCH / 25.4
+CM = INCH / 2.54
+A4_WIDTH, A4_HEIGHT = INCH * 8.3, INCH * 11.7
 
 # Global variables for g_options
 g_options = False
@@ -41,12 +41,12 @@ def drawMonthTitle(cr, x, y, width, height, dateObject):
 	if(g_options.abbreviate):
 		style="%b"
 	monthString = dateObject.strftime(style)
-	drawText(cr,monthString, x, y, math.floor(height/3))
+	drawText(cr, monthString, x, y, math.floor(height / 3))
 
 
 def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	# font size in pixels
-	FONTSIZE=12
+	FONTSIZE = 12
 
 	# fill box if weekend
 	if(dateObject.isoweekday() >= 6):
@@ -64,8 +64,8 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	cr.set_source_rgb(0, 0, 0)
 	cr.select_font_face(g_options.font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 	cr.set_font_size(10)
-	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE*0.3333),FONTSIZE
-	cr.move_to((x+OFFSET_X), (y+OFFSET_Y))
+	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE * 0.3333),FONTSIZE
+	cr.move_to((x + OFFSET_X), (y + OFFSET_Y))
 	
 	style = "%A"
 	if(g_options.abbreviate):
@@ -75,10 +75,10 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 
 def drawMonth(cr, year, month):
 	# constants
-	SAFTY = 5*MM
-	PAGE_WIDTH = 7.425*CM
-	CELL_WIDTH, CELL_HEIGHT = 3.2125*CM, 2.375*CM
-	LINE_WIDTH = 0.03*CM
+	SAFTY = 5 * MM
+	PAGE_WIDTH = 7.425 * CM
+	CELL_WIDTH, CELL_HEIGHT = 3.2125 * CM, 2.375 * CM
+	LINE_WIDTH = 0.01 * CM
 
 	# Creating a new date object with the first day of the month to draw
 	date = datetime.date(year, month, 1)
@@ -95,35 +95,35 @@ def drawMonth(cr, year, month):
 	page = 0
 	# for every day of the month
 	while month == date.month:
-		row=math.floor(cellsOnPage/2)
+		row=math.floor(cellsOnPage / 2)
 
 		# positions on page
-		x=SAFTY+(page*PAGE_WIDTH)
-		y=SAFTY+(row*CELL_HEIGHT)
+		x = SAFTY + (page * PAGE_WIDTH)
+		y = SAFTY + (row * CELL_HEIGHT)
 
 		# add cell width if date is odd
-		if(date.day%2!=0):
+		if(date.day % 2 != 0):
 			x += CELL_WIDTH
 
 		# draw day
 		drawDay(cr, x, y, CELL_WIDTH, CELL_HEIGHT, LINE_WIDTH, date)
 
 		# increment cell counter
-		cellsOnPage+=1
+		cellsOnPage += 1
 
 		# increment date by one day
 		date += one_day
 
 		# if more than 8 cells on page
-		if(cellsOnPage>=cellsOnPageMax):
+		if(cellsOnPage >= cellsOnPageMax):
 			# reset cells on page counter
-			cellsOnPage=0
+			cellsOnPage = 0
 			# increment page counter
-			page+=1
+			page += 1
 
 def drawCalendar():
 	logging.debug("Creating Cario Surface and Context")
-	logging.debug("width = %sp/%scm, height = %sp/%scm", A4_HEIGHT, A4_HEIGHT/CM, A4_WIDTH, A4_WIDTH/CM)
+	logging.debug("width = %sp/%scm, height = %sp/%scm", A4_HEIGHT, A4_HEIGHT / CM, A4_WIDTH, A4_WIDTH / CM)
 	surface = cairo.PDFSurface(g_options.out, A4_HEIGHT, A4_WIDTH)
 	cr = cairo.Context(surface)
 
@@ -139,7 +139,7 @@ def drawCalendar():
 	# draw second month
 	cr.translate(A4_HEIGHT, 0)
 	cr.rotate(math.pi)
-	drawMonth(cr, today.year, today.month+1)
+	drawMonth(cr, today.year, today.month + 1)
 
 	logging.info("Finished drawing Calendar!")
 
