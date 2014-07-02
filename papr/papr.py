@@ -11,15 +11,21 @@ import optparse
 import datetime
 import logging
 
-# Constants
-# A4 Width and Height for PDF Surface - 1p = 1/72in
-INCH = 72
-MM = INCH / 25.4
-CM = INCH / 2.54
-A4_WIDTH, A4_HEIGHT = INCH * 8.3, INCH * 11.7
 
-# Global variables for g_options
-g_options = False
+# globale variables
+g_options = False # command line options
+
+# constants
+INCH = 72 # 72 pixels (p) = 1 inch (in)
+MM = INCH / 25.4 # 25.4 milimeters (mm) = 1 in
+CM = INCH / 2.54 # 2.54 centimetes (cm) = 1 in
+A4_WIDTH, A4_HEIGHT = INCH * 8.3, INCH * 11.7 # DIN A4 Paper is 297mm heigh and 210mm wide
+
+SAFTY = 5 * MM # print safty margin 
+PAGE_WIDTH = 7.425 * CM # width of a folded page
+CELL_WIDTH, CELL_HEIGHT = 3.2125 * CM, 2.375 * CM # width and height of a page cell
+LINE_WIDTH = 0.01 * CM # line width of the cells
+
 
 def drawText(cr, text, x, y, fontSize):
 	cr.move_to(x, y)
@@ -31,18 +37,38 @@ def drawText(cr, text, x, y, fontSize):
 	layout.set_font_description(font)
 
 	layout.set_text(text)
+	logging.debug("text: '%s' font size: %s pixel_size: %s", text,fontSize, layout.get_pixel_size())
 	cr.set_source_rgb(0, 0, 0)
 	pc.update_layout(layout)
 	pc.show_layout(layout)
 
 def drawMonthTitle(cr, x, y, width, height, dateObject):
-#	cr.move_to(x, y+(height/2))
 	style = "%B"
 	if(g_options.abbreviate):
 		style="%b"
 	monthString = dateObject.strftime(style)
-	drawText(cr, monthString, x, y, math.floor(height / 3))
 
+	cr.move_to(x, y)
+	pc = pangocairo.CairoContext(cr)
+	pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
+
+	layout = pc.create_layout()
+	layout.set_text(monthString)
+
+	fits = False
+	fontSize = 20
+	while not fits:
+		font = pango.FontDescription("%s %s" % (g_options.font, fontSize))
+		layout.set_font_description(font)
+		logging.debug("font size: %s pixel_size: %s",fontSize, layout.get_pixel_size())
+		if(layout.get_pixel_size()[0] <= CELL_WIDTH):
+			fits=True
+		else:
+			fontSize-=1
+
+	cr.set_source_rgb(0, 0, 0)
+	pc.update_layout(layout)
+	pc.show_layout(layout)
 
 def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	# font size in pixels
@@ -70,12 +96,6 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	drawText(cr, dayString, x+OFFSET_X,y+OFFSET_Y, FONTSIZE)
 
 def drawMonth(cr, year, month):
-	# constants
-	SAFTY = 5 * MM
-	PAGE_WIDTH = 7.425 * CM
-	CELL_WIDTH, CELL_HEIGHT = 3.2125 * CM, 2.375 * CM
-	LINE_WIDTH = 0.01 * CM
-
 	# Creating a new date object with the first day of the month to draw
 	date = datetime.date(year, month, 1)
 	logging.info("drawing %s...", date.strftime("%B"))
