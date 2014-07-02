@@ -46,7 +46,7 @@ def drawMonthTitle(cr, x, y, width, height, dateObject):
 
 def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	# font size in pixels
-	FONTSIZE = 12
+	FONTSIZE = 6
 
 	# fill box if weekend
 	if(dateObject.isoweekday() >= 6):
@@ -61,17 +61,13 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	cr.stroke()
 
 	# drawing the text
-	cr.set_source_rgb(0, 0, 0)
-	cr.select_font_face(g_options.font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-	cr.set_font_size(10)
-	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE * 0.3333),FONTSIZE
-	cr.move_to((x + OFFSET_X), (y + OFFSET_Y))
+	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE * 0.3333), math.floor(FONTSIZE * 0.3333)
 	
 	style = "%A"
 	if(g_options.abbreviate):
 		style = "%a"
 	dayString = "%s %s" % (dateObject.day, dateObject.strftime(style))
-	cr.show_text(dayString)
+	drawText(cr, dayString, x+OFFSET_X,y+OFFSET_Y, FONTSIZE)
 
 def drawMonth(cr, year, month):
 	# constants
