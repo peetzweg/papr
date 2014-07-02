@@ -44,7 +44,7 @@ def drawText(cr, text, x, y, fontSize):
 
 def drawMonthTitle(cr, x, y, width, height, dateObject):
 	style = "%B"
-	if(g_options.abbreviate):
+	if(g_options.abbreviate_all):
 		style="%b"
 	monthString = dateObject.strftime(style)
 
@@ -90,7 +90,7 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE * 0.3333), math.floor(FONTSIZE * 0.3333)
 	
 	style = "%A"
-	if(g_options.abbreviate):
+	if(g_options.abbreviate or g_options.abbreviate_all):
 		style = "%a"
 	dayString = "%s %s" % (dateObject.day, dateObject.strftime(style))
 	drawText(cr, dayString, x+OFFSET_X,y+OFFSET_Y, FONTSIZE)
@@ -167,7 +167,9 @@ def main():
 	parser.add_option("-l", "--locale",
 					help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
 	parser.add_option("-a", "--abbreviate", action="store_true", 
-					help="use abbreviations of months and weekdays", default=False)
+					help="use abbreviations for weekdays", default=False)
+	parser.add_option("-A", "--abbreviate_all", action="store_true", 
+					help="use abbreviations for weekdays and months", default=False)
 	parser.add_option("-f", "--font",
 					help="choose which font to use", default="Sans")
 	parser.add_option("-v", "--verbose", action="store_true",
