@@ -26,23 +26,6 @@ PAGE_WIDTH = 7.425 * CM # width of a folded page
 CELL_WIDTH, CELL_HEIGHT = 3.2125 * CM, 2.375 * CM # width and height of a page cell
 LINE_WIDTH = 0.01 * CM # line width of the cells
 
-def drawBranding(cr, x, y):
-	cr.save()
-	height=24
-	width=CELL_WIDTH-12
-	image_surface = cairo.ImageSurface.create_from_png("branding.png")
-	img_height = image_surface.get_height()
-	img_width = image_surface.get_width()
-	width_ratio = float(width) / float(img_width)
-	height_ratio = float(height) / float(img_height)
-	scale_xy = min(height_ratio, width_ratio)
-	# scale image and add it
-	cr.translate(x,y)
-	cr.scale(scale_xy, scale_xy)
-	cr.set_source_surface(image_surface)
-	cr.paint()
-	cr.restore()
-
 def drawText(cr, text, x, y, fontSize):
 	cr.move_to(x, y)
 	pc = pangocairo.CairoContext(cr)
@@ -175,14 +158,12 @@ def drawCalendar():
 	cr.translate(A4_HEIGHT, A4_WIDTH/2)
 	cr.rotate(math.pi)
 	drawMonth(cr, today.year, today.month)
-	drawBranding(cr, SAFTY, SAFTY)
 	cr.restore()
 
 	# draw second month
 	cr.save()
 	cr.translate(0, A4_WIDTH/2)
 	drawMonth(cr, today.year, today.month + 1)
-	drawBranding(cr, SAFTY, SAFTY)
 	cr.restore()
 
 	logging.info("Finished drawing Calendar!")
