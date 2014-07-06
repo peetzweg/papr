@@ -157,13 +157,20 @@ def drawCalendar():
 	cr.save()
 	cr.translate(A4_HEIGHT, A4_WIDTH/2)
 	cr.rotate(math.pi)
-	drawMonth(cr, today.year, today.month)
+	drawMonth(cr, today.year, g_options.month)
 	cr.restore()
 
 	# draw second month
 	cr.save()
 	cr.translate(0, A4_WIDTH/2)
-	drawMonth(cr, today.year, today.month + 1)
+	monthToDraw = g_options.month
+
+	# check if month is december
+	if(monthToDraw == 12):
+		monthToDraw = 1
+	else:
+		monthToDraw += 1
+	drawMonth(cr, today.year, monthToDraw)
 	cr.restore()
 
 	logging.info("Finished drawing Calendar!")
@@ -171,15 +178,19 @@ def drawCalendar():
 def main():
 	# SetUp OptionParser
 	parser = optparse.OptionParser()
-	parser.add_option("-o", "--out", dest="out",
+	parser.add_option("-o", "--out", dest="out", type="string",
 					help="specify output file", default="papr.pdf")
-	parser.add_option("-l", "--locale",
+
+	td = datetime.date.today()
+	parser.add_option("-m", "--month", type="int",
+					help="specify from which month the calendar should start, default is the current month. (1-12)", default=td.month)
+	parser.add_option("-l", "--locale", type="string",
 					help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
 	parser.add_option("-a", "--abbreviate", action="store_true", 
 					help="use abbreviations for weekdays", default=False)
 	parser.add_option("-A", "--abbreviate_all", action="store_true", 
 					help="use abbreviations for weekdays and months", default=False)
-	parser.add_option("-f", "--font",
+	parser.add_option("-f", "--font", type="string",
 					help="choose which font to use", default="Sans")
 	parser.add_option("-v", "--verbose", action="store_true",
 					help="print status messages to stdout", default=False)
@@ -197,6 +208,11 @@ def main():
 				logging.debug("%s = %s", option, getattr(g_options, option.dest))
 	elif(g_options.verbose):
 		logging.basicConfig(format='%(message)s', level="INFO")
+
+	# checking if month is in range
+	if(int(g_options.month) < 1 or int(g_options.month) > 12):
+		logging.error("Specified month must be in the range of 1-12!")
+		sys.exit(1)
 
 	# setting locale
 	try:
