@@ -83,7 +83,7 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	# fill box if weekend
 	if(dateObject.isoweekday() >= 6):
 		cr.rectangle(x, y, width, height)
-		cr.set_source_rgba(0.95, 0.95, 0.95, 1.0)
+		cr.set_source_rgba(0.90, 0.90, 0.90, 1.0)
 		cr.fill()
 
 	# drawing the box
@@ -115,23 +115,21 @@ def drawMonth(cr, year, month):
 	cellsOnPage = 1
 	cellsOnPageMax = 8
 	page = 0
+	row = 1
+	column = 0
 	# for every day of the month
 	while month == date.month:
-		row=math.floor(cellsOnPage / 2)
 
 		# positions on page
-		x = SAFTY + (page * PAGE_WIDTH)
+		x = SAFTY + (page * PAGE_WIDTH) + (column * CELL_WIDTH)
 		y = SAFTY + (row * CELL_HEIGHT)
-
-		# add cell width if date is odd
-		if(date.day % 2 != 0):
-			x += CELL_WIDTH
 
 		# draw day
 		drawDay(cr, x, y, CELL_WIDTH, CELL_HEIGHT, LINE_WIDTH, date)
 
 		# increment cell counter
 		cellsOnPage += 1
+		row += 1
 
 		# increment date by one day
 		date += one_day
@@ -142,6 +140,12 @@ def drawMonth(cr, year, month):
 			cellsOnPage = 0
 			# increment page counter
 			page += 1
+			column = 0
+			row = 0
+
+		if(cellsOnPage == 4):
+			row = 0
+			column += 1
 
 def drawCalendar():
 	logging.debug("Creating Cario Surface and Context")
