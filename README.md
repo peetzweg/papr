@@ -3,10 +3,8 @@ Command line tool to generate a PDF template for a small foldable paper calendar
 
 ![ScreenShot](demo.jpg)
 
-## Table of contents
-
- - [Quick start](#quick-start)
- - [Info](#info)
+## Info
+Papr currently only produces a PDF output. When you are printing the PDF file make sure you have to automated positioning or resizing features of your printer enabled!
 
 ## Quick start
 	Usage: papr.py [options]
@@ -26,5 +24,4 @@ Command line tool to generate a PDF template for a small foldable paper calendar
 	  -v, --verbose         print status messages to stdout
 	  -d, --debug           print status and debug messages to stdout
 
-## Info
-Papr currently only produces a PDF output. When you are printing the PDF file make sure you have to automated positioning or resizing features of your printer enabled!
+
