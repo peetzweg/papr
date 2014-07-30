@@ -21,7 +21,7 @@ MM = INCH / 25.4 # 25.4 milimeters (mm) = 1 in
 CM = INCH / 2.54 # 2.54 centimetes (cm) = 1 in
 A4_WIDTH, A4_HEIGHT = INCH * 8.3, INCH * 11.7 # DIN A4 Paper is 297mm heigh and 210mm wide
 
-SAFTY = 5 * MM # print safty margin 
+SAFTY = 5 * MM # safty margin for printing (A4 printers a unable to print on the whole page)
 PAGE_WIDTH = 7.425 * CM # width of a folded page
 CELL_WIDTH, CELL_HEIGHT = 3.2125 * CM, 2.375 * CM # width and height of a page cell
 LINE_WIDTH = 0.01 * CM # line width of the cells
@@ -177,29 +177,37 @@ def drawCalendar():
 	drawMonth(cr, today.year, monthToDraw)
 	cr.restore()
 
+	cr.save()
+	drawText(cr, g_options.brand, A4_HEIGHT - PAGE_WIDTH + SAFTY, A4_WIDTH / 2 + 3, 6)
+	cr.translate(A4_HEIGHT, A4_WIDTH/2)
+	cr.rotate(math.pi)
+	drawText(cr, g_options.brand, A4_HEIGHT - PAGE_WIDTH + SAFTY, 0 + 3, 6)
+	cr.restore()
+
 	logging.info("Finished drawing Calendar!")
 
 def main():
 	# SetUp OptionParser
 	parser = optparse.OptionParser()
-	parser.add_option("-o", "--out", dest="out", type="string",
-					help="specify output file", default="papr.pdf")
-
+	parser.add_option("-A", "--abbreviate_all", action="store_true", 
+					help="use abbreviations for weekdays and months", default=False)
+	parser.add_option("-a", "--abbreviate", action="store_true", 
+					help="use abbreviations for weekdays", default=False)
+	parser.add_option("-b", "--brand", type="string",
+					help="assign a brand string", default="")
+	parser.add_option("-d", "--debug", action="store_true",
+					help="print status and debug messages to stdout", default=False)
+	parser.add_option("-f", "--font", type="string",
+					help="choose which font to use", default="Sans")
+	parser.add_option("-l", "--locale", type="string",
+					help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
 	td = datetime.date.today()
 	parser.add_option("-m", "--month", type="int",
 					help="specify from which month the calendar should start, default is the current month. (1-12)", default=td.month)
-	parser.add_option("-l", "--locale", type="string",
-					help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
-	parser.add_option("-a", "--abbreviate", action="store_true", 
-					help="use abbreviations for weekdays", default=False)
-	parser.add_option("-A", "--abbreviate_all", action="store_true", 
-					help="use abbreviations for weekdays and months", default=False)
-	parser.add_option("-f", "--font", type="string",
-					help="choose which font to use", default="Sans")
+	parser.add_option("-o", "--out", dest="out", type="string",
+					help="specify output file", default="papr.pdf")
 	parser.add_option("-v", "--verbose", action="store_true",
 					help="print status messages to stdout", default=False)
-	parser.add_option("-d", "--debug", action="store_true",
-					help="print status and debug messages to stdout", default=False)
 	global g_options
 	(g_options, arguments) = parser.parse_args()
 
