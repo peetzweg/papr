@@ -104,7 +104,7 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 def drawMonth(cr, year, month):
 	# Creating a new date object with the first day of the month to draw
 	date = datetime.date(year, month, 1)
-	logging.info("drawing %s...", date.strftime("%B"))
+	logging.info("drawing %s...", date.strftime("%B %Y"))
 
 	# Defining a one day timedelta object to increase the date object
 	one_day = datetime.timedelta(days=1)
@@ -158,23 +158,26 @@ def drawCalendar():
 	logging.info("assuming today is %s.%s.%s",today.day,today.month,today.year)
 
 	# draw first month
+	monthToDraw = g_options.month
+	yearToDraw = today.year
 	cr.save()
 	cr.translate(A4_HEIGHT, A4_WIDTH/2)
 	cr.rotate(math.pi)
-	drawMonth(cr, today.year, g_options.month)
+	drawMonth(cr, yearToDraw, monthToDraw)
 	cr.restore()
 
 	# draw second month
 	cr.save()
 	cr.translate(0, A4_WIDTH/2)
-	monthToDraw = g_options.month
 
-	# check if month is december
+	# check if last month was december
+	# if so set month to january and increment year
 	if(monthToDraw == 12):
 		monthToDraw = 1
+		yearToDraw += 1
 	else:
 		monthToDraw += 1
-	drawMonth(cr, today.year, monthToDraw)
+	drawMonth(cr, yearToDraw, monthToDraw)
 	cr.restore()
 
 	cr.save()
