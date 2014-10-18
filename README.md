@@ -1,3 +1,5 @@
+# [Download](https://s3-eu-west-1.amazonaws.com/pczek.github.com/calendar/latest.pdf)
+
 # papr
 Command line tool to generate a PDF template for a small foldable paper calendar.
 
