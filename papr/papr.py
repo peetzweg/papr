@@ -159,7 +159,7 @@ def drawCalendar():
 
 	# draw first month
 	monthToDraw = g_options.month
-	yearToDraw = today.year
+	yearToDraw = g_options.year
 	cr.save()
 	cr.translate(A4_HEIGHT, A4_WIDTH/2)
 	cr.rotate(math.pi)
@@ -206,11 +206,13 @@ def main():
 					help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
 	td = datetime.date.today()
 	parser.add_option("-m", "--month", type="int",
-					help="specify from which month the calendar should start, default is the current month. (1-12)", default=td.month)
+					help="specify the starting month as a number (1-12), default is the current month ("+str(td.month)+").", default=td.month)
 	parser.add_option("-o", "--out", dest="out", type="string",
 					help="specify output file", default="papr.pdf")
 	parser.add_option("-v", "--verbose", action="store_true",
 					help="print status messages to stdout", default=False)
+	parser.add_option("-y", "--year", type="int",
+					help="specify the year the calendar should start, default is the current year ("+str(td.year)+").", default=td.year)
 	global g_options
 	(g_options, arguments) = parser.parse_args()
 
@@ -227,6 +229,11 @@ def main():
 	# checking if month is in range
 	if(int(g_options.month) < 1 or int(g_options.month) > 12):
 		logging.error("Specified month must be in the range of 1-12!")
+		sys.exit(1)
+	
+	# checking if month is in range
+	if(int(g_options.year) < datetime.MINYEAR or int(g_options.year) > datetime.MAXYEAR):
+		logging.error("Specified year must be in the range of %d - %d!", datetime.MINYEAR, datetime.MAXYEAR)
 		sys.exit(1)
 
 	# setting locale
