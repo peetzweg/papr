@@ -10,6 +10,30 @@ import pangocairo
 import optparse
 import datetime
 import logging
+from copy import copy
+
+# Custom optparse options
+class CalendarOption (optparse.Option):
+
+	def check_year(option, opt, value):
+		# strftime() cannot use years before 1990
+		lowerLimit = 1990
+		upperLimit = datetime.MAXYEAR
+
+		# in range() the upperLimit is exclusive
+		if(int(value) not in range(lowerLimit, upperLimit+1)):
+			raise optparse.OptionValueError("option %s: invalid year value: %r (must be integer value in range %u - %u)" % (opt, value, lowerLimit, upperLimit))
+		return int(value)
+
+	def check_month(option, opt, value):
+		if(int(value) not in range (1, 12+1)):
+			raise optparse.OptionValueError("option %s: invalid month value: %r" % (opt, value))
+		return int(value)
+
+	TYPES = optparse.Option.TYPES + ("year", "month")
+	TYPE_CHECKER = copy(optparse.Option.TYPE_CHECKER)
+	TYPE_CHECKER["year"] = check_year
+	TYPE_CHECKER["month"] = check_month
 
 
 # globale variables
@@ -191,7 +215,7 @@ def drawCalendar():
 
 def main():
 	# SetUp OptionParser
-	parser = optparse.OptionParser()
+	parser = optparse.OptionParser(option_class=CalendarOption)
 	parser.add_option("-A", "--abbreviate_all", action="store_true", 
 					help="use abbreviations for weekdays and months", default=False)
 	parser.add_option("-a", "--abbreviate", action="store_true", 
@@ -200,18 +224,18 @@ def main():
 					help="assign a brand string", default="")
 	parser.add_option("-d", "--debug", action="store_true",
 					help="print status and debug messages to stdout", default=False)
-	parser.add_option("-f", "--font", type="string",
-					help="choose which font to use", default="Sans")
+	font_map = pangocairo.cairo_font_map_get_default()
+	parser.add_option("-f", "--font", type="choice", choices=[f.get_name() for f in font_map.list_families()], help="choose which font to use", default="Sans")
 	parser.add_option("-l", "--locale", type="string",
 					help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
 	td = datetime.date.today()
-	parser.add_option("-m", "--month", type="int",
+	parser.add_option("-m", "--month", type="month",
 					help="specify the starting month as a number (1-12), default is the current month ("+str(td.month)+").", default=td.month)
 	parser.add_option("-o", "--out", dest="out", type="string",
 					help="specify output file", default="papr.pdf")
 	parser.add_option("-v", "--verbose", action="store_true",
 					help="print status messages to stdout", default=False)
-	parser.add_option("-y", "--year", type="int",
+	parser.add_option("-y", "--year", type="year",
 					help="specify the year the calendar should start, default is the current year ("+str(td.year)+").", default=td.year)
 	global g_options
 	(g_options, arguments) = parser.parse_args()
@@ -226,28 +250,12 @@ def main():
 	elif(g_options.verbose):
 		logging.basicConfig(format='%(message)s', level="INFO")
 
-	# checking if month is in range
-	if(int(g_options.month) < 1 or int(g_options.month) > 12):
-		logging.error("Specified month must be in the range of 1-12!")
-		sys.exit(1)
-	
-	# checking if month is in range
-	if(int(g_options.year) < datetime.MINYEAR or int(g_options.year) > datetime.MAXYEAR):
-		logging.error("Specified year must be in the range of %d - %d!", datetime.MINYEAR, datetime.MAXYEAR)
-		sys.exit(1)
-
 	# setting locale
 	try:
 		logging.debug("setting locale to '%s'", g_options.locale)
 		locale.setlocale(locale.LC_ALL, g_options.locale)
 	except locale.Error:
 		logging.error("Unsupported locale: '%s'!\nList all supported locales with 'locale -a'",g_options.locale)
-		sys.exit(1)
-
-	# check if selected font is available
-	font_map = pangocairo.cairo_font_map_get_default()
-	if(g_options.font not in [f.get_name() for f in   font_map.list_families()]):
-		logging.error("Unsupported font: '%s'!\nInstalled fonts are:\n%s", g_options.font, [f.get_name() for f in   font_map.list_families()])
 		sys.exit(1)
 
 	drawCalendar()
