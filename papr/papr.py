@@ -12,6 +12,15 @@ import datetime
 import logging
 from copy import copy
 
+# globale variables
+g_options = False # command line options
+
+# pixel to length constants (cairo 72 pixel = 1 inch)
+INCH = 72 # 72 pixels (p) = 1 inch (in)
+MM = INCH / 25.4 # 25.4 milimeters (mm) = 1 in
+CM = INCH / 2.54 # 2.54 centimetes (cm) = 1 in
+
+
 # Custom optparse options
 class CalendarOption (optparse.Option):
 
@@ -35,14 +44,28 @@ class CalendarOption (optparse.Option):
 	TYPE_CHECKER["year"] = check_year
 	TYPE_CHECKER["month"] = check_month
 
+class CalendarEnviroment():
+	
+	def __init__(self, PaperSize):
+		try:
+			getattr(self, PaperSize)()
+		except AttributeError:
+			logging.error("Unsupported size of paper")
+			sys.exit(1)
+		logging.info(self.width)
 
-# globale variables
-g_options = False # command line options
+	def USLetter(self):
+		self.width = 8.5 * INCH
+		self.height = 11.0 * INCH
 
-# constants
-INCH = 72 # 72 pixels (p) = 1 inch (in)
-MM = INCH / 25.4 # 25.4 milimeters (mm) = 1 in
-CM = INCH / 2.54 # 2.54 centimetes (cm) = 1 in
+	def A4(self):
+		self.width = 21.0 * CM
+		self.height = 29.7 * CM
+
+	def A3(self):
+		self.width = 29.7 * CM
+		self.height = 42.0 * CM
+	
 A4_WIDTH, A4_HEIGHT = INCH * 8.3, INCH * 11.7 # DIN A4 Paper is 297mm heigh and 210mm wide
 
 SAFTY = 5 * MM # safty margin for printing (A4 printers a unable to print on the whole page)
@@ -216,27 +239,43 @@ def drawCalendar():
 def main():
 	# SetUp OptionParser
 	parser = optparse.OptionParser(option_class=CalendarOption)
+	
 	parser.add_option("-A", "--abbreviate_all", action="store_true", 
 					help="use abbreviations for weekdays and months", default=False)
+	
 	parser.add_option("-a", "--abbreviate", action="store_true", 
 					help="use abbreviations for weekdays", default=False)
+	
 	parser.add_option("-b", "--brand", type="string",
 					help="assign a brand string", default="")
+	
 	parser.add_option("-d", "--debug", action="store_true",
 					help="print status and debug messages to stdout", default=False)
+	
 	font_map = pangocairo.cairo_font_map_get_default()
 	parser.add_option("-f", "--font", type="choice", choices=[f.get_name() for f in font_map.list_families()], help="choose which font to use", default="Sans")
+	
 	parser.add_option("-l", "--locale", type="string",
 					help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
+	
+	# create date object to set default month and year to today
 	td = datetime.date.today()
 	parser.add_option("-m", "--month", type="month",
 					help="specify the starting month as a number (1-12), default is the current month ("+str(td.month)+").", default=td.month)
+	
 	parser.add_option("-o", "--out", dest="out", type="string",
-					help="specify output file", default="papr.pdf")
+					help="specify output file", default="out.pdf")
+
+	# currently supported sizes of paper
+	paperSizes = ("A4","A3","USLetter")
+	parser.add_option("-p", "--paper", type="choice", choices=paperSizes, help="choose which paper dimensions should be used "+str(paperSizes)+" default is A4", default="A4")
+
 	parser.add_option("-v", "--verbose", action="store_true",
 					help="print status messages to stdout", default=False)
+
 	parser.add_option("-y", "--year", type="year",
 					help="specify the year the calendar should start, default is the current year ("+str(td.year)+").", default=td.year)
+	
 	global g_options
 	(g_options, arguments) = parser.parse_args()
 
@@ -258,6 +297,7 @@ def main():
 		logging.error("Unsupported locale: '%s'!\nList all supported locales with 'locale -a'",g_options.locale)
 		sys.exit(1)
 
+	env = CalendarEnviroment(g_options.paper)
 	drawCalendar()
 
 	return 0
