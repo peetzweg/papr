@@ -12,9 +12,6 @@ import datetime
 import logging
 from copy import copy
 
-# globale variables
-g_options = False # command line options
-
 # pixel to length constants (cairo 72 pixel = 1 inch)
 INCH = 72 # 72 pixels (p) = 1 inch (in)
 MM = INCH / 25.4 # 25.4 milimeters (mm) = 1 in
@@ -44,54 +41,26 @@ class CalendarOption (optparse.Option):
 	TYPE_CHECKER["year"] = check_year
 	TYPE_CHECKER["month"] = check_month
 
-class CalendarEnviroment():
-	
-	def __init__(self, PaperSize):
-		try:
-			getattr(self, PaperSize)()
-		except AttributeError:
-			logging.error("Unsupported size of paper")
-			sys.exit(1)
-		logging.info(self.width)
-
-	def USLetter(self):
-		self.width = 8.5 * INCH
-		self.height = 11.0 * INCH
-
-	def A4(self):
-		self.width = 21.0 * CM
-		self.height = 29.7 * CM
-
-	def A3(self):
-		self.width = 29.7 * CM
-		self.height = 42.0 * CM
-	
-A4_WIDTH, A4_HEIGHT = INCH * 8.3, INCH * 11.7 # DIN A4 Paper is 297mm heigh and 210mm wide
-
-SAFTY = 5 * MM # safty margin for printing (A4 printers a unable to print on the whole page)
-PAGE_WIDTH = 7.425 * CM # width of a folded page
-CELL_WIDTH, CELL_HEIGHT = 3.2125 * CM, 2.375 * CM # width and height of a page cell
-LINE_WIDTH = 0.01 * CM # line width of the cells
-
-def drawText(cr, text, x, y, fontSize):
+def drawText(cr, env, text, x, y, fontSize):
 	cr.move_to(x, y)
 	pc = pangocairo.CairoContext(cr)
 	pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
 
 	layout = pc.create_layout()
-	font = pango.FontDescription("%s %s" % (g_options.font, fontSize))
+	font = pango.FontDescription("%s %s" % (env.font, fontSize))
 	layout.set_font_description(font)
 
 	layout.set_text(text)
-	logging.debug("text: '%s' font size: %s pixel_size: %s", text,fontSize, layout.get_pixel_size())
+	logging.debug("text: '%s' font size: %s pixel_size: %s", text, fontSize, layout.get_pixel_size())
 	cr.set_source_rgb(0, 0, 0)
 	pc.update_layout(layout)
 	pc.show_layout(layout)
 
-def drawMonthTitle(cr, x, y, width, height, dateObject):
+def drawMonthTitle(cr, env, x, y, width, height, dateObject):
+
 	# preparing month string
 	style = "%B"
-	if(g_options.abbreviate_all):
+	if(env.abbreviate_all):
 		style="%b"
 	monthString = dateObject.strftime(style)
 
@@ -106,16 +75,16 @@ def drawMonthTitle(cr, x, y, width, height, dateObject):
 	fits = False
 	fontSize = 20
 	while not fits:
-		font = pango.FontDescription("%s %s" % (g_options.font, fontSize))
+		font = pango.FontDescription("%s %s" % (env.font, fontSize))
 		layout.set_font_description(font)
 		logging.debug("font size: %s pixel_size: %s",fontSize, layout.get_pixel_size())
-		if(layout.get_pixel_size()[0] <= CELL_WIDTH):
+		if(layout.get_pixel_size()[0] <= env.cell_width):
 			fits=True
 		else:
 			fontSize-=1
 
 	# preparing cairo context
-	y += ((CELL_HEIGHT / 2) - (layout.get_pixel_size()[1]/2))
+	y += ((env.cell_height / 2) - (layout.get_pixel_size()[1]/2))
 	cr.move_to(x, y)
 	cr.set_source_rgb(0, 0, 0)
 
@@ -123,9 +92,7 @@ def drawMonthTitle(cr, x, y, width, height, dateObject):
 	pc.update_layout(layout)
 	pc.show_layout(layout)
 
-def drawDay(cr, x, y, width, height, lineWidth, dateObject):
-	# font size in pixels
-	FONTSIZE = 6
+def drawDay(cr, env, x, y, width, height, lineWidth, dateObject):
 
 	# fill box if weekend
 	if(dateObject.isoweekday() >= 6):
@@ -140,15 +107,16 @@ def drawDay(cr, x, y, width, height, lineWidth, dateObject):
 	cr.stroke()
 
 	# drawing the text
-	OFFSET_X, OFFSET_Y = math.floor(FONTSIZE * 0.3333), math.floor(FONTSIZE * 0.3333)
+	OFFSET_X, OFFSET_Y = math.floor(env.font_size * 0.3333), math.floor(env.font_size * 0.3333)
 	
 	style = "%A"
-	if(g_options.abbreviate or g_options.abbreviate_all):
+	if(env.abbreviate or env.abbreviate_all):
 		style = "%a"
 	dayString = "%s %s" % (dateObject.day, dateObject.strftime(style))
-	drawText(cr, dayString, x+OFFSET_X,y+OFFSET_Y, FONTSIZE)
+	drawText(cr, env, dayString, x+OFFSET_X,y+OFFSET_Y, env.font_size)
 
-def drawMonth(cr, year, month):
+def drawMonth(cr, env, year, month):
+
 	# Creating a new date object with the first day of the month to draw
 	date = datetime.date(year, month, 1)
 	logging.info("drawing %s...", date.strftime("%B %Y"))
@@ -157,7 +125,7 @@ def drawMonth(cr, year, month):
 	one_day = datetime.timedelta(days=1)
 
 	# draw month name in first cell
-	drawMonthTitle(cr, SAFTY, SAFTY, CELL_WIDTH, CELL_HEIGHT, date)
+	drawMonthTitle(cr, env, env.safety, env.safety, env.cell_width, env.cell_height, date)
 
 	cellsOnPage = 1
 	cellsOnPageMax = 8
@@ -168,11 +136,11 @@ def drawMonth(cr, year, month):
 	while month == date.month:
 
 		# positions on page
-		x = SAFTY + (page * PAGE_WIDTH) + (column * CELL_WIDTH)
-		y = SAFTY + (row * CELL_HEIGHT)
+		x = env.safety + (page * env.page_width) + (column * env.cell_width)
+		y = env.safety + (row * env.cell_height)
 
 		# draw day
-		drawDay(cr, x, y, CELL_WIDTH, CELL_HEIGHT, LINE_WIDTH, date)
+		drawDay(cr, env, x, y, env.cell_width, env.cell_height, env.line_width, date)
 
 		# increment cell counter
 		cellsOnPage += 1
@@ -194,10 +162,10 @@ def drawMonth(cr, year, month):
 			row = 0
 			column += 1
 
-def drawCalendar():
+def drawCalendar(env):
 	logging.debug("Creating Cario Surface and Context")
-	logging.debug("width = %sp/%scm, height = %sp/%scm", A4_HEIGHT, A4_HEIGHT / CM, A4_WIDTH, A4_WIDTH / CM)
-	surface = cairo.PDFSurface(g_options.out, A4_HEIGHT, A4_WIDTH)
+	logging.debug("width = %sp/%scm, height = %sp/%scm", env.height, env.height / CM, env.width, env.width / CM)
+	surface = cairo.PDFSurface(env.out, env.height, env.width)
 	cr = cairo.Context(surface)
 
 	today = datetime.date.today()
@@ -205,17 +173,17 @@ def drawCalendar():
 	logging.info("assuming today is %s.%s.%s",today.day,today.month,today.year)
 
 	# draw first month
-	monthToDraw = g_options.month
-	yearToDraw = g_options.year
+	monthToDraw = env.month
+	yearToDraw = env.year
 	cr.save()
-	cr.translate(A4_HEIGHT, A4_WIDTH/2)
+	cr.translate(env.height, env.width/2)
 	cr.rotate(math.pi)
-	drawMonth(cr, yearToDraw, monthToDraw)
+	drawMonth(cr, env, yearToDraw, monthToDraw)
 	cr.restore()
 
 	# draw second month
 	cr.save()
-	cr.translate(0, A4_WIDTH/2)
+	cr.translate(0, env.width/2)
 
 	# check if last month was december
 	# if so set month to january and increment year
@@ -224,15 +192,16 @@ def drawCalendar():
 		yearToDraw += 1
 	else:
 		monthToDraw += 1
-	drawMonth(cr, yearToDraw, monthToDraw)
+	drawMonth(cr, env, yearToDraw, monthToDraw)
 	cr.restore()
 
-	cr.save()
-	drawText(cr, g_options.brand, A4_HEIGHT - PAGE_WIDTH + SAFTY, A4_WIDTH / 2 + 3, 6)
-	cr.translate(A4_HEIGHT, A4_WIDTH/2)
-	cr.rotate(math.pi)
-	drawText(cr, g_options.brand, A4_HEIGHT - PAGE_WIDTH + SAFTY, 0 + 3, 6)
-	cr.restore()
+	if(env.brand !=""):
+		cr.save()
+		drawText(cr, env.brand, env.height - env.page_width + env.safety, env.width / 2 + 3, 6)
+		cr.translate(env.height, env.width/2)
+		cr.rotate(math.pi)
+		drawText(cr, env.brand, env.height - env.page_width + env.safety, 0 + 3, 6)
+		cr.restore()
 
 	logging.info("Finished drawing Calendar!")
 
@@ -276,29 +245,47 @@ def main():
 	parser.add_option("-y", "--year", type="year",
 					help="specify the year the calendar should start, default is the current year ("+str(td.year)+").", default=td.year)
 	
-	global g_options
-	(g_options, arguments) = parser.parse_args()
+	(enviroment, arguments) = parser.parse_args()
 
 	# defining output
-	if(g_options.debug):
+	if(enviroment.debug):
 		logging.basicConfig(format='%(message)s', level="DEBUG")
 		# Printing Options for Debugging
 		for option in parser.option_list:
 			if(option.dest != None):
-				logging.debug("%s = %s", option, getattr(g_options, option.dest))
-	elif(g_options.verbose):
+				logging.debug("%s = %s", option, getattr(enviroment, option.dest))
+	elif(enviroment.verbose):
 		logging.basicConfig(format='%(message)s', level="INFO")
 
 	# setting locale
 	try:
-		logging.debug("setting locale to '%s'", g_options.locale)
-		locale.setlocale(locale.LC_ALL, g_options.locale)
+		logging.debug("setting locale to '%s'", enviroment.locale)
+		locale.setlocale(locale.LC_ALL, enviroment.locale)
 	except locale.Error:
-		logging.error("Unsupported locale: '%s'!\nList all supported locales with 'locale -a'",g_options.locale)
+		logging.error("Unsupported locale: '%s'!\nList all supported locales with 'locale -a'", enviroment.locale)
 		sys.exit(1)
 
-	env = CalendarEnviroment(g_options.paper)
-	drawCalendar()
+	logging.debug("Adjusting width and height values according to desired paper format: "+enviroment.paper)
+	if(enviroment.paper=="A4"):
+		enviroment.width = 21.0 * CM
+		enviroment.height = 29.7 * CM
+	elif(enviroment.paper=="A3"):
+		enviroment.width = 29.7 * CM
+		enviroment.height = 42.0 * CM
+	elif(enviroment.paper=="USLetter"):
+		enviroment.width = 8.5 * INCH
+		enviroment.height = 11.0 * INCH
+
+
+	# adding aditional information to enviroment
+	enviroment.safety = 5 * MM # env.safety margin for printing (A4 printers a unable to print on the whole page)
+	enviroment.page_width = 7.425 * CM # width of a folded page
+	enviroment.cell_width = 3.2125 * CM
+	enviroment.cell_height = 2.375 * CM
+	enviroment.line_width = 0.01 * CM
+	enviroment.font_size = 6
+
+	drawCalendar(enviroment)
 
 	return 0
 
