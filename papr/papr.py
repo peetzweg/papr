@@ -269,6 +269,7 @@ def main():
 	if(enviroment.paper=="A4"):
 		enviroment.width = 21.0 * CM
 		enviroment.height = 29.7 * CM
+		enviroment
 	elif(enviroment.paper=="A3"):
 		enviroment.width = 29.7 * CM
 		enviroment.height = 42.0 * CM
@@ -279,9 +280,9 @@ def main():
 
 	# adding aditional information to enviroment
 	enviroment.safety = 5 * MM # env.safety margin for printing (A4 printers a unable to print on the whole page)
-	enviroment.page_width = 7.425 * CM # width of a folded page
-	enviroment.cell_width = 3.2125 * CM
-	enviroment.cell_height = 2.375 * CM
+	enviroment.page_width = enviroment.height / 4.0 # 4 pages in landscape
+	enviroment.cell_width = (enviroment.page_width - 2.0 * enviroment.safety) / 2
+	enviroment.cell_height = (enviroment.width / 8.0) - ((2 * enviroment.safety) / 4.0)
 	enviroment.line_width = 0.01 * CM
 	enviroment.font_size = 6
 
