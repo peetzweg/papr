@@ -231,6 +231,9 @@ def main():
 	td = datetime.date.today()
 	parser.add_option("-m", "--month", type="month",
 					help="specify the starting month as a number (1-12), default is the current month ("+str(td.month)+").", default=td.month)
+
+	parser.add_option("--margin", type="int",
+					help="specify the margin of the calendar in millimeters. Used to adapt to your printer, default ist 5mm" , default=5)
 	
 	parser.add_option("-o", "--out", dest="out", type="string",
 					help="specify output file", default="out.pdf")
@@ -279,7 +282,7 @@ def main():
 
 
 	# adding aditional information to enviroment
-	enviroment.safety = 5 * MM # env.safety margin for printing (A4 printers a unable to print on the whole page)
+	enviroment.safety = enviroment.margin * MM # env.safety margin for printing (A4 printers a unable to print on the whole page)
 	enviroment.page_width = enviroment.height / 4.0 # 4 pages in landscape
 	enviroment.cell_width = (enviroment.page_width - 2.0 * enviroment.safety) / 2
 	enviroment.cell_height = (enviroment.width / 8.0) - ((2 * enviroment.safety) / 4.0)
