@@ -197,10 +197,10 @@ def drawCalendar(env):
 
 	if(env.brand !=""):
 		cr.save()
-		drawText(cr, env.brand, env.height - env.page_width + env.safety, env.width / 2 + 3, 6)
+		drawText(cr, env, env.brand, env.height - env.page_width + env.safety, env.width / 2 + 3, 6)
 		cr.translate(env.height, env.width/2)
 		cr.rotate(math.pi)
-		drawText(cr, env.brand, env.height - env.page_width + env.safety, 0 + 3, 6)
+		drawText(cr, env, env.brand, env.height - env.page_width + env.safety, 0 + 3, 6)
 		cr.restore()
 
 	logging.info("Finished drawing Calendar!")
