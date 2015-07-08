@@ -46,15 +46,31 @@ def drawText(cr, env, text, x, y, fontSize):
 	pc = pangocairo.CairoContext(cr)
 	pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
 
-	layout = pc.create_layout()
-	font = pango.FontDescription("%s %s" % (env.font, fontSize))
-	layout.set_font_description(font)
+	# Number
+	layoutNumber = pc.create_layout()
+	fontNumber = pango.FontDescription("%s heavy %s" % (env.font, fontSize))
+	layoutNumber.set_font_description(fontNumber)
 
-	layout.set_text(text)
-	logging.debug("text: '%s' font size: %s pixel_size: %s", text, fontSize, layout.get_pixel_size())
+	layoutNumber.set_text(text.split()[0])
+	if env.color:
+		cr.set_source_rgb(0.6, 0, 0)
+	else:
+		cr.set_source_rgb(0, 0, 0)
+	pc.update_layout(layoutNumber)
+	pc.show_layout(layoutNumber)
+
+	# Day
+	dimensions = layoutNumber.get_pixel_size()
+	cr.move_to(x+dimensions[0]+fontSize/2, y)
+	layoutDay = pc.create_layout()
+	fontDay = pango.FontDescription("%s %s" % (env.font, fontSize))
+	layoutDay.set_font_description(fontDay)
+
+	layoutDay.set_text(text.split()[1])
 	cr.set_source_rgb(0, 0, 0)
-	pc.update_layout(layout)
-	pc.show_layout(layout)
+	pc.update_layout(layoutDay)
+	pc.show_layout(layoutDay)
+
 
 def drawMonthTitle(cr, env, x, y, width, height, dateObject):
 
@@ -208,16 +224,19 @@ def drawCalendar(env):
 def main():
 	# SetUp OptionParser
 	parser = optparse.OptionParser(option_class=CalendarOption)
-	
-	parser.add_option("-A", "--abbreviate_all", action="store_true", 
+
+	parser.add_option("-A", "--abbreviate_all", action="store_true",
 					help="use abbreviations for weekdays and months", default=False)
-	
-	parser.add_option("-a", "--abbreviate", action="store_true", 
+
+	parser.add_option("-a", "--abbreviate", action="store_true",
 					help="use abbreviations for weekdays", default=False)
-	
+
 	parser.add_option("-b", "--brand", type="string",
 					help="assign a brand string", default="")
-	
+
+	parser.add_option("-c", "--color", action="store_true",
+					help="color date numbers", default=False)
+
 	parser.add_option("-d", "--debug", action="store_true",
 					help="print status and debug messages to stdout", default=False)
 	
@@ -284,6 +303,7 @@ def main():
 	# adding aditional information to enviroment
 	enviroment.safety = enviroment.margin * MM # env.safety margin for printing (A4 printers a unable to print on the whole page)
 	enviroment.page_width = enviroment.height / 4.0 # 4 pages in landscape
+	
 	enviroment.cell_width = (enviroment.page_width - 2.0 * enviroment.safety) / 2
 	enviroment.cell_height = (enviroment.width / 8.0) - ((2 * enviroment.safety) / 4.0)
 	enviroment.line_width = 0.01 * CM
