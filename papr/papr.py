@@ -124,7 +124,7 @@ def drawDay(cr, env, x, y, width, height, lineWidth, dateObject):
 
 	# drawing the text
 	OFFSET_X, OFFSET_Y = math.floor(env.font_size * 0.3333), math.floor(env.font_size * 0.3333)
-	
+
 	style = "%A"
 	if(env.abbreviate or env.abbreviate_all):
 		style = "%a"
@@ -239,13 +239,13 @@ def main():
 
 	parser.add_option("-d", "--debug", action="store_true",
 					help="print status and debug messages to stdout", default=False)
-	
+
 	font_map = pangocairo.cairo_font_map_get_default()
 	parser.add_option("-f", "--font", type="choice", choices=[f.get_name() for f in font_map.list_families()], help="choose which font to use", default="Sans")
-	
+
 	parser.add_option("-l", "--locale", type="string",
-					help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US.UTF8")
-	
+					help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US")
+
 	# create date object to set default month and year to today
 	td = datetime.date.today()
 	parser.add_option("-m", "--month", type="month",
@@ -253,7 +253,7 @@ def main():
 
 	parser.add_option("--margin", type="int",
 					help="specify the margin of the calendar in millimeters. Used to adapt to your printer, default ist 5mm" , default=5)
-	
+
 	parser.add_option("-o", "--out", dest="out", type="string",
 					help="specify output file", default="out.pdf")
 
@@ -266,7 +266,7 @@ def main():
 
 	parser.add_option("-y", "--year", type="year",
 					help="specify the year the calendar should start, default is the current year ("+str(td.year)+").", default=td.year)
-	
+
 	(enviroment, arguments) = parser.parse_args()
 
 	# defining output
@@ -284,7 +284,7 @@ def main():
 		logging.debug("setting locale to '%s'", enviroment.locale)
 		locale.setlocale(locale.LC_ALL, enviroment.locale)
 	except locale.Error:
-		logging.error("Unsupported locale: '%s'!\nList all supported locales with 'locale -a'", enviroment.locale)
+		logging.error("locale: '%s' not found!\nList all installed locales with 'locale -a' and choose locale with -l/--locale option.", enviroment.locale)
 		sys.exit(1)
 
 	logging.debug("Adjusting width and height values according to desired paper format: "+enviroment.paper)
@@ -303,7 +303,7 @@ def main():
 	# adding aditional information to enviroment
 	enviroment.safety = enviroment.margin * MM # env.safety margin for printing (A4 printers a unable to print on the whole page)
 	enviroment.page_width = enviroment.height / 4.0 # 4 pages in landscape
-	
+
 	enviroment.cell_width = (enviroment.page_width - 2.0 * enviroment.safety) / 2
 	enviroment.cell_height = (enviroment.width / 8.0) - ((2 * enviroment.safety) / 4.0)
 	enviroment.line_width = 0.01 * CM
