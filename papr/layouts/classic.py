@@ -11,9 +11,21 @@ from util import metrics
 
 
 def drawCalendar(env):
+    logging.debug(
+        "Adding aditional information to enviroment specific to this cal style")
+    env.page_width = env.height / 4.0  # 4 pages in landscape
+
+    env.cell_width = (env.page_width -
+                      2.0 * env.safety) / 2
+    env.cell_height = (env.width / 8.0) - \
+        ((2 * env.safety) / 4.0)
+    env.line_width = 0.01 * metrics.CM
+    env.font_size = 6
+
     logging.debug("Creating Cario Surface and Context")
     logging.debug("width = %sp/%scm, height = %sp/%scm", env.height,
                   env.height / metrics.CM, env.width, env.width / metrics.CM)
+
     surface = cairo.PDFSurface(env.out, env.height, env.width)
     cr = cairo.Context(surface)
 
@@ -123,14 +135,13 @@ def drawMonthTitle(cr, env, x, y, width, height, dateObject):
 
 
 def drawDay(cr, env, x, y, width, height, lineWidth, dateObject):
-
     # fill box if weekend
     if(dateObject.isoweekday() >= 6):
         cr.rectangle(x, y, width, height)
         cr.set_source_rgba(0.90, 0.90, 0.90, 1.0)
         cr.fill()
 
-    # drawing the box
+    # stroke the box
     cr.set_source_rgba(0, 0, 0, 1.0)
     cr.set_line_width(lineWidth)
     cr.rectangle(x, y, width, height)
