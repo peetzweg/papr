@@ -10,7 +10,6 @@ import logging
 from util import metrics
 from copy import copy
 from layouts import classic
-
 from layouts import column
 
 def main():
@@ -67,14 +66,9 @@ def main():
 
     # defining output
     if(enviroment.debug):
-        logging.basicConfig(format='%(message)s', level="DEBUG")
-        # Printing Options for Debugging
-        for option in parser.argument_list:
-            if(option.dest != None):
-                logging.debug("%s = %s", option, getattr(
-                    enviroment, option.dest))
+        logging.basicConfig(format='%(message)s', level=logging.DEBUG)
     elif(enviroment.verbose):
-        logging.basicConfig(format='%(message)s', level="INFO")
+        logging.basicConfig(format='%(message)s', level=logging.INFO)
 
     # setting locale
     try:
@@ -101,6 +95,13 @@ def main():
     # env.safety margin for printing (A4 printers a unable to print on the
     # whole page)
     enviroment.safety = enviroment.margin * metrics.MM
+
+    if (enviroment.debug):
+        # Printing Options for Debugging
+        dic = vars(enviroment)
+        for key in dic:
+            if(dic[key] != None):
+                logging.debug("%s = %s", key, dic[key])
 
     drawCalendar = {"classic": classic.drawCalendar,
                     "column": column.drawCalendar}
