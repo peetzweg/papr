@@ -11,6 +11,8 @@ from util import metrics
 from copy import copy
 from layouts import classic
 from layouts import column
+from layouts import oneyear
+
 
 def main():
     # SetUp OptionParser
@@ -59,7 +61,7 @@ def main():
 
     parser.add_argument("-d", "--debug", action="store_true",
                         help="print status and debug messages to stdout", default=False)
-    layouts = ("classic", "column")
+    layouts = ("classic", "column", 'oneyear')
     parser.add_argument("layout", choices=layouts, metavar="LAYOUT",
                         help="choose calendar layout: " + str(layouts))
     enviroment = parser.parse_args()
@@ -104,7 +106,8 @@ def main():
                 logging.debug("%s = %s", key, dic[key])
 
     drawCalendar = {"classic": classic.drawCalendar,
-                    "column": column.drawCalendar}
+                    "column": column.drawCalendar,
+                    "oneyear": oneyear.drawCalendar}
     drawCalendar[enviroment.layout](enviroment)
 
     return 0
