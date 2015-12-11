@@ -82,7 +82,7 @@ def drawMonthTitle(cr, env, date):
 
 def drawDay(cr, env, date):
     cr.save()
-    yOffset = env.safety + ((date.day - 1) * env.row_height) + (2 * env.safety)
+    yOffset = env.safety + (2 * env.row_height) + ((date.day - 1) * env.row_height)
     if(date.day > 15):  # add folding margin for other half of the month
         yOffset += 2 * env.safety
     # translate to drawing point
