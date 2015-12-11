@@ -48,8 +48,6 @@ def drawMonth(cr, env, date):
         startingMonth = date.month
         while date.month == startingMonth:
             # increment date by one day
-
-            logging.debug(date)
             drawDay(cr, env, date)
             date += ONE_DAY
         cr.restore()
