@@ -16,12 +16,12 @@ def drawCalendar(env):
     env.font_size = 6
     env.line_width = 0.01 * metrics.CM
     env.row_width = (env.height - (13.0 * env.safety)) / 12.0
-
-    logging.debug('row is %smm', env.row_width / metrics.MM)
-
     env.row_height = (env.width - (2 * env.safety)) / 32
 
-    logging.debug("Creating Cario Surface and Contex")
+    logging.debug('row is %smm/%spx wide', env.row_width / metrics.MM, env.row_width)
+    logging.debug('row is %smm/%spx high', env.row_height / metrics.MM, env.row_height)
+
+    logging.debug("Creating Cario Surface and Context")
     logging.debug("width = %sp/%scm, height = %sp/%scm", env.height,
                   env.height / metrics.CM, env.width, env.width / metrics.CM)
     surface = cairo.PDFSurface(env.out, env.height, env.width)
@@ -80,11 +80,14 @@ def drawMonthTitle(cr, env, date):
 
 
 def drawDay(cr, env, date):
-    cr.save()
+    cr.save() # save matrix
+
     yOffset = env.safety + \
         ((date.day - 1) * env.row_height) + (1.0 * env.row_height)
-    # translate to drawing point
+
+    # translate to drawing point top left corner
     cr.translate(0.0, yOffset)
+
     # fill box if weekend
     if(date.isoweekday() >= 6):
         cr.set_source_rgba(0.90, 0.90, 0.90, 1.0)
@@ -97,21 +100,46 @@ def drawDay(cr, env, date):
     cr.rectangle(0, 0, env.row_width, env.row_height)
     cr.stroke()
 
-    # Text
+    # Setting Text
     pc = pangocairo.CairoContext(cr)
     pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
-    layout = pc.create_layout()
-    font = pango.FontDescription("%s %s" % (env.font, env.font_size))
-    layout.set_font_description(font)
 
-    style = "%A"
-    if(env.abbreviate or env.abbreviate_all):
-        style = "%a"
-    dayString = "%s %s" % (date.day, date.strftime(style))
-    layout.set_text(dayString)
+    dayLayout = pc.create_layout()
+    numberLayout = pc.create_layout()
 
-    yOffset = (env.row_height - (layout.get_pixel_size()[1])) / 2
-    cr.translate(env.font_size / 2, yOffset)
-    pc.update_layout(layout)
-    pc.show_layout(layout)
+    daySize = math.floor(env.row_height * 0.2)
+    numberSize = math.floor(env.row_height * 0.5)
+
+    dayFont = pango.FontDescription("%s %s" % (env.font, daySize)) # day text is way smaller than number
+    numberFont = pango.FontDescription("%s %s" % (env.font, numberSize))
+
+    dayLayout.set_font_description(dayFont)
+    numberLayout.set_font_description(numberFont)
+
+    style = "%a" # by default abbreviated because need of space!
+    # if(env.abbreviate or env.abbreviate_all):
+    #     style = "%a"
+    weekdayString = "%s" % (date.strftime(style))
+    dayLayout.set_text(weekdayString) # Weekday
+    numberLayout.set_text("%s" % date.day) # Number
+
+    # draw Number
+    cr.save()
+    xOffset = math.floor((env.row_width / 8)  - (numberLayout.get_pixel_size()[0] / 2))
+    yOffset = (env.row_height - numberSize - daySize) / 3
+    cr.translate(xOffset, yOffset)
+    pc.update_layout(numberLayout)
+    pc.show_layout(numberLayout)
     cr.restore()
+
+    # draw Weekday
+    cr.save()
+    xOffset = math.floor((env.row_width / 8)  - (dayLayout.get_pixel_size()[0] / 2))
+
+    yOffset = env.row_height - yOffset -daySize
+    cr.translate(xOffset, yOffset)
+    pc.update_layout(dayLayout)
+    pc.show_layout(dayLayout)
+    cr.restore()
+
+    cr.restore() # restore matrix
