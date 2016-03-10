@@ -8,7 +8,6 @@ import argparse
 import datetime
 import logging
 from util import metrics
-from copy import copy
 from layouts import classic
 from layouts import column
 from layouts import oneyear
@@ -49,7 +48,7 @@ def main():
                         help="specify the year the calendar should start, default is the current year (" + str(td.year) + ").", default=td.year)
 
     # currently supported sizes of paper
-    paperSizes = ("A4", "A3", "USLetter")
+    paperSizes = ("A5", "A4", "A3", "A2", "A1", "A0", "USLetter")
     parser.add_argument("-p", "--paper", choices=paperSizes,
                         help="choose which paper dimensions should be used " + str(paperSizes) + " default is A4", default="A4")
 
@@ -83,13 +82,24 @@ def main():
 
     logging.debug(
         "Adjusting width and height values according to desired paper format: " + enviroment.paper)
-    if(enviroment.paper == "A4"):
+    if(enviroment.paper == "A5"):
+        enviroment.width = 14.8 * metrics.CM
+        enviroment.height = 21.0 * metrics.CM
+    elif(enviroment.paper == "A4"):
         enviroment.width = 21.0 * metrics.CM
         enviroment.height = 29.7 * metrics.CM
-        enviroment
     elif(enviroment.paper == "A3"):
         enviroment.width = 29.7 * metrics.CM
         enviroment.height = 42.0 * metrics.CM
+    elif(enviroment.paper == "A2"):
+        enviroment.width = 42.0 * metrics.CM
+        enviroment.height = 59.4 * metrics.CM
+    elif(enviroment.paper == "A1"):
+        enviroment.width = 59.4 * metrics.CM
+        enviroment.height = 84.1 * metrics.CM
+    elif(enviroment.paper == "A0"):
+        enviroment.width = 84.1 * metrics.CM
+        enviroment.height = 118.9 * metrics.CM
     elif(enviroment.paper == "USLetter"):
         enviroment.width = 8.5 * metrics.INCH
         enviroment.height = 11.0 * metrics.INCH
