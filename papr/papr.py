@@ -33,8 +33,8 @@ def main():
                         help="color date numbers", default=False)
 
     font_map = pangocairo.cairo_font_map_get_default()
-    parser.add_argument("-f", "--font", choices=[f.get_name(
-    ) for f in font_map.list_families()], help="choose which font to use", default="Sans", metavar="FONT")
+    parser.add_argument("-f", "--fonts", choices=[f.get_name(
+    ) for f in font_map.list_families()], help="choose which font to use", default="Sans", metavar="FONT", nargs="+")
 
     parser.add_argument("-l", "--locale",
                         help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US")
@@ -63,54 +63,64 @@ def main():
     layouts = ("classic", "column", 'oneyear')
     parser.add_argument("layout", choices=layouts, metavar="LAYOUT",
                         help="choose calendar layout: " + str(layouts))
-    enviroment = parser.parse_args()
+    environment = parser.parse_args()
 
     # defining output
-    if(enviroment.debug):
+    if(environment.debug):
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-    elif(enviroment.verbose):
+    elif(environment.verbose):
         logging.basicConfig(format='%(message)s', level=logging.INFO)
 
     # setting locale
     try:
-        logging.debug("setting locale to '%s'", enviroment.locale)
-        locale.setlocale(locale.LC_ALL, enviroment.locale)
+        logging.debug("setting locale to '%s'", environment.locale)
+        locale.setlocale(locale.LC_ALL, environment.locale)
     except locale.Error:
         logging.error(
-            "locale: '%s' not found!\nList all installed locales with 'locale -a' and choose locale with -l/--locale option.", enviroment.locale)
+            "locale: '%s' not found!\nList all installed locales with 'locale -a' and choose locale with -l/--locale option.", environment.locale)
         sys.exit(1)
 
     logging.debug(
-        "Adjusting width and height values according to desired paper format: " + enviroment.paper)
-    if(enviroment.paper == "A5"):
-        enviroment.width = 14.8 * metrics.CM
-        enviroment.height = 21.0 * metrics.CM
-    elif(enviroment.paper == "A4"):
-        enviroment.width = 21.0 * metrics.CM
-        enviroment.height = 29.7 * metrics.CM
-    elif(enviroment.paper == "A3"):
-        enviroment.width = 29.7 * metrics.CM
-        enviroment.height = 42.0 * metrics.CM
-    elif(enviroment.paper == "A2"):
-        enviroment.width = 42.0 * metrics.CM
-        enviroment.height = 59.4 * metrics.CM
-    elif(enviroment.paper == "A1"):
-        enviroment.width = 59.4 * metrics.CM
-        enviroment.height = 84.1 * metrics.CM
-    elif(enviroment.paper == "A0"):
-        enviroment.width = 84.1 * metrics.CM
-        enviroment.height = 118.9 * metrics.CM
-    elif(enviroment.paper == "USLetter"):
-        enviroment.width = 8.5 * metrics.INCH
-        enviroment.height = 11.0 * metrics.INCH
+        "Adjusting width and height values according to desired paper format: " + environment.paper)
+    if environment.paper == "A5":
+        environment.width = 14.8 * metrics.CM
+        environment.height = 21.0 * metrics.CM
+    elif environment.paper == "A4":
+        environment.width = 21.0 * metrics.CM
+        environment.height = 29.7 * metrics.CM
+    elif environment.paper == "A3":
+        environment.width = 29.7 * metrics.CM
+        environment.height = 42.0 * metrics.CM
+    elif environment.paper == "A2":
+        environment.width = 42.0 * metrics.CM
+        environment.height = 59.4 * metrics.CM
+    elif environment.paper == "A1":
+        environment.width = 59.4 * metrics.CM
+        environment.height = 84.1 * metrics.CM
+    elif environment.paper == "A0":
+        environment.width = 84.1 * metrics.CM
+        environment.height = 118.9 * metrics.CM
+    elif environment.paper == "USLetter":
+        environment.width = 8.5 * metrics.INCH
+        environment.height = 11.0 * metrics.INCH
+
+
+    # Setup fonts
+    environment.font = environment.fonts.pop() # last provided font is used generally
+    try:
+        environment.fontHeading = environment.fonts.pop() # use additional provided font for headers
+    except IndexError:
+        environment.fontHeading = environment.font # if just one font set heading font same as general
+
 
     # env.safety margin for printing (A4 printers a unable to print on the
     # whole page)
-    enviroment.safety = enviroment.margin * metrics.MM
+    environment.safety = environment.margin * metrics.MM
 
-    if (enviroment.debug):
+
+    if (environment.debug):
         # Printing Options for Debugging
-        dic = vars(enviroment)
+        dic = vars(environment)
         for key in dic:
             if(dic[key] != None):
                 logging.debug("%s = %s", key, dic[key])
@@ -118,7 +128,7 @@ def main():
     drawCalendar = {"classic": classic.drawCalendar,
                     "column": column.drawCalendar,
                     "oneyear": oneyear.drawCalendar}
-    drawCalendar[enviroment.layout](enviroment)
+    drawCalendar[environment.layout](environment)
 
     return 0
 

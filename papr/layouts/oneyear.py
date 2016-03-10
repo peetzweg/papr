@@ -28,7 +28,7 @@ def drawCalendar(env):
     cr = cairo.Context(surface)
 
     date = datetime.date(env.year, env.month, 1)
-    drawMonth(cr, env, date)
+    drawMonth(cr, env, date) # TODO using it totally worng, loop here over the function not in the function itself!
     logging.info("Finished drawing Calendar!")
 
 
@@ -58,13 +58,16 @@ def drawMonthTitle(cr, env, date):
     pc = pangocairo.CairoContext(cr)
     pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
     layout = pc.create_layout()
-    font = pango.FontDescription("%s %s" % (env.font, env.font_size * 2))
+    size = math.ceil(env.row_height * 0.9) # calculating font-size depending on the row height
+    font = pango.FontDescription("%s %s" % (env.fontHeading, size))
     layout.set_font_description(font)
 
     # preparing month string
-    style = "%B"
-    if(env.abbreviate_all):
-        style = "%b"
+    style = "%b"
+    # TODO String is always abbreviated, adjust the font-size depending on the row width for all month titles!
+    # style = "%B"
+    # if(env.abbreviate_all):
+    #     style = "%b"
     monthString = date.strftime(style)
 
     layout.set_text(monthString)
@@ -107,8 +110,9 @@ def drawDay(cr, env, date):
     dayLayout = pc.create_layout()
     numberLayout = pc.create_layout()
 
-    daySize = math.floor(env.row_height * 0.2)
+    daySize = math.floor(env.row_height * 0.25)
     numberSize = math.floor(env.row_height * 0.5)
+    yOffset = (env.row_height* 0.25) / 2
 
     dayFont = pango.FontDescription("%s %s" % (env.font, daySize)) # day text is way smaller than number
     numberFont = pango.FontDescription("%s %s" % (env.font, numberSize))
@@ -125,18 +129,19 @@ def drawDay(cr, env, date):
 
     # draw Number
     cr.save()
-    xOffset = math.floor((env.row_width / 8)  - (numberLayout.get_pixel_size()[0] / 2))
-    yOffset = (env.row_height - numberSize - daySize) / 3
-    cr.translate(xOffset, yOffset)
+    xOffset = math.ceil((env.row_width / 8)  - (numberLayout.get_pixel_size()[0] / 2))
+    # yOffset = math.floor((env.row_height - numberSize - daySize - (daySize/2)) / 2)
+    numberOffset = yOffset + ((numberSize - numberLayout.get_pixel_size()[1])/2)
+
+    cr.translate(xOffset, numberOffset)
     pc.update_layout(numberLayout)
     pc.show_layout(numberLayout)
     cr.restore()
 
     # draw Weekday
     cr.save()
-    xOffset = math.floor((env.row_width / 8)  - (dayLayout.get_pixel_size()[0] / 2))
-
-    yOffset = env.row_height - yOffset -daySize
+    xOffset = math.ceil((env.row_width / 8)  - (dayLayout.get_pixel_size()[0] / 2))
+    yOffset = env.row_height - yOffset - daySize
     cr.translate(xOffset, yOffset)
     pc.update_layout(dayLayout)
     pc.show_layout(dayLayout)
