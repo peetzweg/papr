@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import math
-import cairo
-import pango
-import pangocairo
 import datetime
 import logging
+
+import cairo
+from gi.repository import Pango
+from gi.repository import PangoCairo
+
 from util import metrics
+from util import layout_draw
 
 
 def drawCalendar(env):
@@ -56,27 +59,22 @@ def drawMonth(cr, env, date):
 
 def drawMonthTitle(cr, env, date):
     cr.save()
-    pc = pangocairo.CairoContext(cr)
-    pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
-    layout = pc.create_layout()
-    font = pango.FontDescription("%s %s" % (env.font, env.font_size * 2))
-    layout.set_font_description(font)
+    with layout_draw(cr) as layout:
+        font = Pango.FontDescription("%s %s" % (env.font, env.font_size * 2))
+        layout.set_font_description(font)
 
-    # preparing month string
-    style = "%B"
-    if(env.abbreviate_all):
-        style = "%b"
-    monthString = date.strftime(style)
+        # preparing month string
+        style = "%B"
+        if(env.abbreviate_all):
+            style = "%b"
+        monthString = date.strftime(style)
 
-    layout.set_text(monthString)
-    xOffset = (env.column_width - layout.get_pixel_size()[0]) / 2
-    yOffset = (((env.row_height * 2) -
-                layout.get_pixel_size()[1]) / 2) + env.safety
+        layout.set_text(monthString, -1)
+        xOffset = (env.column_width - layout.get_pixel_size()[0]) / 2
+        yOffset = (((env.row_height * 2) -
+                    layout.get_pixel_size()[1]) / 2) + env.safety
 
-    cr.translate(xOffset, yOffset)
-
-    pc.update_layout(layout)
-    pc.show_layout(layout)
+        cr.translate(xOffset, yOffset)
     cr.restore()
 
 
@@ -100,20 +98,16 @@ def drawDay(cr, env, date):
     cr.stroke()
 
     # Text
-    pc = pangocairo.CairoContext(cr)
-    pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
-    layout = pc.create_layout()
-    font = pango.FontDescription("%s %s" % (env.font, env.font_size))
-    layout.set_font_description(font)
+    with layout_draw(cr) as layout:
+        font = Pango.FontDescription("%s %s" % (env.font, env.font_size))
+        layout.set_font_description(font)
 
-    style = "%A"
-    if(env.abbreviate or env.abbreviate_all):
-        style = "%a"
-    dayString = "%s %s" % (date.day, date.strftime(style))
-    layout.set_text(dayString)
+        style = "%A"
+        if(env.abbreviate or env.abbreviate_all):
+            style = "%a"
+        dayString = "%s %s" % (date.day, date.strftime(style))
+        layout.set_text(dayString, -1)
 
-    yOffset = (env.row_height - (layout.get_pixel_size()[1])) / 2
-    cr.translate(env.font_size / 2, yOffset)
-    pc.update_layout(layout)
-    pc.show_layout(layout)
+        yOffset = (env.row_height - (layout.get_pixel_size()[1])) / 2
+        cr.translate(env.font_size / 2, yOffset)
     cr.restore()

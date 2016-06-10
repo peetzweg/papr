@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import math
-import cairo
-import pango
-import pangocairo
 import datetime
 import logging
+
+import cairo
+from gi.repository import Pango
+from gi.repository import PangoCairo
+
 from util import metrics
+from util import layout_draw
 
 
 def drawCalendar(env):
@@ -55,30 +58,26 @@ def drawMonth(cr, env, date):
 
 def drawMonthTitle(cr, env, date):
     cr.save()
-    pc = pangocairo.CairoContext(cr)
-    pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
-    layout = pc.create_layout()
-    size = math.ceil(env.row_height * 0.9) # calculating font-size depending on the row height
-    font = pango.FontDescription("%s %s" % (env.fontHeading, size))
-    layout.set_font_description(font)
+    with layout_draw(cr) as layout:
+        size = math.ceil(env.row_height * 0.9) # calculating font-size depending on the row height
+        font = Pango.FontDescription("%s %s" % (env.fontHeading, size))
+        layout.set_font_description(font)
 
-    # preparing month string
-    style = "%b"
-    # TODO String is always abbreviated, adjust the font-size depending on the row width for all month titles!
-    # style = "%B"
-    # if(env.abbreviate_all):
-    #     style = "%b"
-    monthString = date.strftime(style)
+        # preparing month string
+        style = "%b"
+        # TODO String is always abbreviated, adjust the font-size depending on the row width for all month titles!
+        # style = "%B"
+        # if(env.abbreviate_all):
+        #     style = "%b"
+        monthString = date.strftime(style)
 
-    layout.set_text(monthString)
-    xOffset = (env.row_width - layout.get_pixel_size()[0]) / 2
-    yOffset = (env.safety + (1.0 * env.row_height)) - \
-        layout.get_pixel_size()[1]
+        layout.set_text(monthString, -1)
+        xOffset = (env.row_width - layout.get_pixel_size()[0]) / 2
+        yOffset = (env.safety + (1.0 * env.row_height)) - \
+            layout.get_pixel_size()[1]
 
-    cr.translate(xOffset, yOffset)
+        cr.translate(xOffset, yOffset)
 
-    pc.update_layout(layout)
-    pc.show_layout(layout)
     cr.restore()
 
 
@@ -103,48 +102,37 @@ def drawDay(cr, env, date):
     cr.rectangle(0, 0, env.row_width, env.row_height)
     cr.stroke()
 
-    # Setting Text
-    pc = pangocairo.CairoContext(cr)
-    pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
-
-    dayLayout = pc.create_layout()
-    numberLayout = pc.create_layout()
-
     daySize = math.floor(env.row_height * 0.25)
     numberSize = math.floor(env.row_height * 0.5)
     yOffset = (env.row_height* 0.25) / 2
 
-    dayFont = pango.FontDescription("%s %s" % (env.font, daySize)) # day text is way smaller than number
-    numberFont = pango.FontDescription("%s %s" % (env.font, numberSize))
-
-    dayLayout.set_font_description(dayFont)
-    numberLayout.set_font_description(numberFont)
+    dayFont = Pango.FontDescription("%s %s" % (env.font, daySize)) # day text is way smaller than number
+    numberFont = Pango.FontDescription("%s %s" % (env.font, numberSize))
 
     style = "%a" # by default abbreviated because need of space!
     # if(env.abbreviate or env.abbreviate_all):
     #     style = "%a"
     weekdayString = "%s" % (date.strftime(style))
-    dayLayout.set_text(weekdayString) # Weekday
-    numberLayout.set_text("%s" % date.day) # Number
 
-    # draw Number
-    cr.save()
-    xOffset = math.ceil((env.row_width / 8)  - (numberLayout.get_pixel_size()[0] / 2))
-    # yOffset = math.floor((env.row_height - numberSize - daySize - (daySize/2)) / 2)
-    numberOffset = yOffset + ((numberSize - numberLayout.get_pixel_size()[1])/2)
+    with layout_draw(cr) as numberLayout:
+        numberLayout.set_font_description(numberFont)
+        numberLayout.set_text("%s" % date.day, -1) # Number
 
-    cr.translate(xOffset, numberOffset)
-    pc.update_layout(numberLayout)
-    pc.show_layout(numberLayout)
+        cr.save()
+        xOffset = math.ceil((env.row_width / 8)  - (numberLayout.get_pixel_size()[0] / 2))
+        # yOffset = math.floor((env.row_height - numberSize - daySize - (daySize/2)) / 2)
+        numberOffset = yOffset + ((numberSize - numberLayout.get_pixel_size()[1])/2)
+        cr.translate(xOffset, numberOffset)
     cr.restore()
 
-    # draw Weekday
-    cr.save()
-    xOffset = math.ceil((env.row_width / 8)  - (dayLayout.get_pixel_size()[0] / 2))
-    yOffset = env.row_height - yOffset - daySize
-    cr.translate(xOffset, yOffset)
-    pc.update_layout(dayLayout)
-    pc.show_layout(dayLayout)
+    with layout_draw(cr) as dayLayout:
+        dayLayout.set_font_description(dayFont)
+        dayLayout.set_text(weekdayString, -1) # Weekday
+
+        cr.save()
+        xOffset = math.ceil((env.row_width / 8)  - (dayLayout.get_pixel_size()[0] / 2))
+        yOffset = env.row_height - yOffset - daySize
+        cr.translate(xOffset, yOffset)
     cr.restore()
 
     cr.restore() # restore matrix
