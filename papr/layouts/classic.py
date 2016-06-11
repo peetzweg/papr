@@ -10,7 +10,7 @@ from gi.repository import Pango
 from gi.repository import PangoCairo
 
 from util import metrics
-from util import layout_draw
+from util import drawing
 
 
 def drawCalendar(env):
@@ -35,35 +35,32 @@ def drawCalendar(env):
     # draw first month
     monthToDraw = env.month
     yearToDraw = env.year
-    cr.save()
-    cr.translate(env.height, env.width / 2)
-    cr.rotate(math.pi)
-    drawMonth(cr, env, yearToDraw, monthToDraw)
-    cr.restore()
-
-    # draw second month
-    cr.save()
-    cr.translate(0, env.width / 2)
-
-    # check if last month was december
-    # if so set month to january and increment year
-    if(monthToDraw == 12):
-        monthToDraw = 1
-        yearToDraw += 1
-    else:
-        monthToDraw += 1
-    drawMonth(cr, env, yearToDraw, monthToDraw)
-    cr.restore()
-
-    if(env.brand != ""):
-        cr.save()
-        drawText(cr, env, env.brand, env.height -
-                 env.page_width + env.safety, env.width / 2 + 3, 6)
+    with drawing.restoring_transform(cr):
         cr.translate(env.height, env.width / 2)
         cr.rotate(math.pi)
-        drawText(cr, env, env.brand, env.height -
-                 env.page_width + env.safety, 0 + 3, 6)
-        cr.restore()
+        drawMonth(cr, env, yearToDraw, monthToDraw)
+
+    with drawing.restoring_transform(cr):
+        # draw second month
+        cr.translate(0, env.width / 2)
+
+        # check if last month was december
+        # if so set month to january and increment year
+        if(monthToDraw == 12):
+            monthToDraw = 1
+            yearToDraw += 1
+        else:
+            monthToDraw += 1
+        drawMonth(cr, env, yearToDraw, monthToDraw)
+
+    if(env.brand != ""):
+        with drawing.restoring_transform(cr):
+            drawText(cr, env, env.brand, env.height -
+                     env.page_width + env.safety, env.width / 2 + 3, 6)
+            cr.translate(env.height, env.width / 2)
+            cr.rotate(math.pi)
+            drawText(cr, env, env.brand, env.height -
+                     env.page_width + env.safety, 0 + 3, 6)
 
     logging.info("Finished drawing Calendar!")
 
@@ -71,7 +68,7 @@ def drawCalendar(env):
 def drawText(cr, env, text, x, y, fontSize):
     cr.move_to(x, y)
     # Number
-    with layout_draw(cr) as layoutNumber:
+    with drawing.layout(cr) as layoutNumber:
         fontNumber = Pango.FontDescription("%s heavy %s" % (env.font, fontSize))
         layoutNumber.set_font_description(fontNumber)
 
@@ -84,7 +81,7 @@ def drawText(cr, env, text, x, y, fontSize):
     # Day
     dimensions = layoutNumber.get_pixel_size()
     cr.move_to(x + dimensions[0] + fontSize / 2, y)
-    with layout_draw(cr) as layoutDay:
+    with drawing.layout(cr) as layoutDay:
         fontDay = Pango.FontDescription("%s %s" % (env.font, fontSize))
         layoutDay.set_font_description(fontDay)
 
@@ -99,7 +96,7 @@ def drawMonthTitle(cr, env, x, y, width, height, dateObject):
         style = "%b"
     monthString = dateObject.strftime(style)
 
-    with layout_draw(cr) as layout:
+    with drawing.layout(cr) as layout:
         layout.set_text(monthString, -1)
 
         # calculate font size
