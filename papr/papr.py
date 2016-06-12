@@ -38,7 +38,7 @@ def main():
 
     font_map = PangoCairo.font_map_get_default()
     parser.add_argument("-f", "--fonts", choices=[f.get_name(
-    ) for f in font_map.list_families()], help="choose which font to use", default="Sans", metavar="FONT", nargs="+")
+    ) for f in font_map.list_families()], help="choose which font(s) to use", default=['Sans'], metavar="FONT", nargs="+")
 
     parser.add_argument("-l", "--locale",
                         help="choose locale to use (default en_US.UTF8, check 'locale -a' for available locales)", default="en_US")
