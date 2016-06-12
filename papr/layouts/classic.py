@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import math
-import cairo
-import pango
-import pangocairo
 import datetime
 import logging
+
+import cairo
+from gi.repository import Pango
+from gi.repository import PangoCairo
+
 from util import metrics
+from util import drawing
 
 
 def drawCalendar(env):
@@ -32,106 +35,87 @@ def drawCalendar(env):
     # draw first month
     monthToDraw = env.month
     yearToDraw = env.year
-    cr.save()
-    cr.translate(env.height, env.width / 2)
-    cr.rotate(math.pi)
-    drawMonth(cr, env, yearToDraw, monthToDraw)
-    cr.restore()
-
-    # draw second month
-    cr.save()
-    cr.translate(0, env.width / 2)
-
-    # check if last month was december
-    # if so set month to january and increment year
-    if(monthToDraw == 12):
-        monthToDraw = 1
-        yearToDraw += 1
-    else:
-        monthToDraw += 1
-    drawMonth(cr, env, yearToDraw, monthToDraw)
-    cr.restore()
-
-    if(env.brand != ""):
-        cr.save()
-        drawText(cr, env, env.brand, env.height -
-                 env.page_width + env.safety, env.width / 2 + 3, 6)
+    with drawing.restoring_transform(cr):
         cr.translate(env.height, env.width / 2)
         cr.rotate(math.pi)
-        drawText(cr, env, env.brand, env.height -
-                 env.page_width + env.safety, 0 + 3, 6)
-        cr.restore()
+        drawMonth(cr, env, yearToDraw, monthToDraw)
+
+    with drawing.restoring_transform(cr):
+        # draw second month
+        cr.translate(0, env.width / 2)
+
+        # check if last month was december
+        # if so set month to january and increment year
+        if(monthToDraw == 12):
+            monthToDraw = 1
+            yearToDraw += 1
+        else:
+            monthToDraw += 1
+        drawMonth(cr, env, yearToDraw, monthToDraw)
+
+    if(env.brand != ""):
+        with drawing.restoring_transform(cr):
+            drawText(cr, env, env.brand, env.height -
+                     env.page_width + env.safety, env.width / 2 + 3, 6)
+            cr.translate(env.height, env.width / 2)
+            cr.rotate(math.pi)
+            drawText(cr, env, env.brand, env.height -
+                     env.page_width + env.safety, 0 + 3, 6)
 
     logging.info("Finished drawing Calendar!")
 
 
 def drawText(cr, env, text, x, y, fontSize):
     cr.move_to(x, y)
-    pc = pangocairo.CairoContext(cr)
-    pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
-
     # Number
-    layoutNumber = pc.create_layout()
-    fontNumber = pango.FontDescription("%s heavy %s" % (env.font, fontSize))
-    layoutNumber.set_font_description(fontNumber)
+    with drawing.layout(cr) as layoutNumber:
+        fontNumber = Pango.FontDescription("%s heavy %s" % (env.font, fontSize))
+        layoutNumber.set_font_description(fontNumber)
 
-    layoutNumber.set_text(text.split()[0])
-    if env.color:
-        cr.set_source_rgb(0.6, 0, 0)
-    else:
-        cr.set_source_rgb(0, 0, 0)
-    pc.update_layout(layoutNumber)
-    pc.show_layout(layoutNumber)
+        layoutNumber.set_text(text.split()[0], -1)
+        if env.color:
+            cr.set_source_rgb(0.6, 0, 0)
+        else:
+            cr.set_source_rgb(0, 0, 0)
 
     # Day
     dimensions = layoutNumber.get_pixel_size()
     cr.move_to(x + dimensions[0] + fontSize / 2, y)
-    layoutDay = pc.create_layout()
-    fontDay = pango.FontDescription("%s %s" % (env.font, fontSize))
-    layoutDay.set_font_description(fontDay)
+    with drawing.layout(cr) as layoutDay:
+        fontDay = Pango.FontDescription("%s %s" % (env.font, fontSize))
+        layoutDay.set_font_description(fontDay)
 
-    layoutDay.set_text(text.split()[1])
-    cr.set_source_rgb(0, 0, 0)
-    pc.update_layout(layoutDay)
-    pc.show_layout(layoutDay)
+        layoutDay.set_text(text.split()[1], -1)
+        cr.set_source_rgb(0, 0, 0)
 
 
 def drawMonthTitle(cr, env, x, y, width, height, dateObject):
-
     # preparing month string
     style = "%B"
     if(env.abbreviate_all):
         style = "%b"
     monthString = dateObject.strftime(style)
 
-    # preparing pango context and layout
-    pc = pangocairo.CairoContext(cr)
-    pc.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
+    with drawing.layout(cr) as layout:
+        layout.set_text(monthString, -1)
 
-    layout = pc.create_layout()
-    layout.set_text(monthString)
+        # calculate font size
+        fits = False
+        fontSize = 20
+        while not fits:
+            font = Pango.FontDescription("%s %s" % (env.font, fontSize))
+            layout.set_font_description(font)
+            logging.debug("font size: %s pixel_size: %s",
+                          fontSize, layout.get_pixel_size())
+            if(layout.get_pixel_size()[0] <= env.cell_width):
+                fits = True
+            else:
+                fontSize -= 1
 
-    # calculate font size
-    fits = False
-    fontSize = 20
-    while not fits:
-        font = pango.FontDescription("%s %s" % (env.font, fontSize))
-        layout.set_font_description(font)
-        logging.debug("font size: %s pixel_size: %s",
-                      fontSize, layout.get_pixel_size())
-        if(layout.get_pixel_size()[0] <= env.cell_width):
-            fits = True
-        else:
-            fontSize -= 1
-
-    # preparing cairo context
-    y += ((env.cell_height / 2) - (layout.get_pixel_size()[1] / 2))
-    cr.move_to(x, y)
-    cr.set_source_rgb(0, 0, 0)
-
-    # drawing pango text
-    pc.update_layout(layout)
-    pc.show_layout(layout)
+        # preparing cairo context
+        y += ((env.cell_height / 2) - (layout.get_pixel_size()[1] / 2))
+        cr.move_to(x, y)
+        cr.set_source_rgb(0, 0, 0)
 
 
 def drawDay(cr, env, x, y, width, height, lineWidth, dateObject):

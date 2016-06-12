@@ -3,10 +3,14 @@
 
 import sys
 import locale
-import pangocairo
 import argparse
 import datetime
 import logging
+
+import gi
+gi.require_version('PangoCairo', '1.0')
+from gi.repository import PangoCairo
+
 from util import metrics
 from layouts import classic
 from layouts import column
@@ -32,7 +36,7 @@ def main():
     parser.add_argument("-c", "--color", action="store_true",
                         help="color date numbers", default=False)
 
-    font_map = pangocairo.cairo_font_map_get_default()
+    font_map = PangoCairo.font_map_get_default()
     parser.add_argument("-f", "--fonts", choices=[f.get_name(
     ) for f in font_map.list_families()], help="choose which font to use", default="Sans", metavar="FONT", nargs="+")
 
