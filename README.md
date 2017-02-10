@@ -50,6 +50,16 @@ Papr currently only produces a PDF output. When you are printing the PDF file ma
       -v, --verbose         print status messages to stdout
       -d, --debug           print status and debug messages to stdout
 
+## Dependencies
+
+### Mac OS
+
+Install with brew:
+
++ gtk+3
++ pyobject3 (not for python 3, its gtk3)
+
+
 ## Layouts
 
 ### oneyear
