@@ -1,8 +1,6 @@
-# [Webconfigurator](http://Calendar.MapOfTea.com/)
+# `papr` - Generate Calendar Stationeries
 
-# papr
-
-Command line tool to generate a PDF template for a small foldable paper calendar.
+Command line tool to generate a empty calendar templates to print.
 
 ![ScreenShot](demo.jpg)
 
@@ -12,7 +10,14 @@ Papr currently only produces a PDF output. When you are printing the PDF file ma
 
 ## Quick start
 
-    usage: papr.py [-h] [-o OUT] [-A] [-a] [-b BRAND] [-c] [-f FONT [FONT ...]]
+Example:
+
+```sh
+> python3 ./papr/papr.py -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
+```
+
+```sh
+usage: papr.py [-h] [-o OUT] [-A] [-a] [-b BRAND] [-c] [-f FONT [FONT ...]]
                    [-l LOCALE] [-m MONTH] [-y YEAR]
                    [-p {A5,A4,A3,A2,A1,A0,USLetter}] [--margin MARGIN] [-v] [-d]
                    LAYOUT
@@ -49,16 +54,31 @@ Papr currently only produces a PDF output. When you are printing the PDF file ma
                             Used to adapt to your printer, default ist 5mm
       -v, --verbose         print status messages to stdout
       -d, --debug           print status and debug messages to stdout
+```
 
-## Dependencies
+## Installation
 
 ### Mac OS
 
-Install with brew:
+1. Install `git` and `python3` run this in your terminal:
 
-+ gtk+3
-+ pyobject3 (not for python 3, its gtk3)
+```sh
+xcode-select --install
+```
 
+2. Install `pygobject3` for python3 using [homebrew](https://brew.sh/)
+
+```sh
+brew install pygobject3
+```
+
+3. Clone repository using `git`
+
+```sh
+git clone https://github.com/peetzweg/papr.git
+```
+
+4. Use `papr` CLI arguments to create your calendar, see [Quick Star Section](https://github.com/peetzweg/papr#quick-start)
 
 ## Layouts
 

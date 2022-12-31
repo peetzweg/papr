@@ -1,2 +1,0 @@
-pycairo==1.8.10
-pygobject>=2.28.0
