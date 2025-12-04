@@ -1,6 +1,6 @@
 [project]
 name = "papr"
-version = "0.1.0"
+version = "1.0.0"
 description = "Command line tool to generate empty calendar templates to print"
 readme = "README.md"
 requires-python = ">=3.8"
