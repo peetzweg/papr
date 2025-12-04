@@ -10,10 +10,16 @@ Papr currently only produces a PDF output. When you are printing the PDF file ma
 
 ## Quick start
 
-Example:
+If using uv:
 
 ```sh
-> python3 ./papr/papr.py -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
+uv run papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
+```
+
+Or if running directly without installation:
+
+```sh
+python3 ./papr/papr.py -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
 ```
 
 ```sh
@@ -58,7 +64,49 @@ usage: papr.py [-h] [-o OUT] [-A] [-a] [-b BRAND] [-c] [-f FONT [FONT ...]]
 
 ## Installation
 
-### Mac OS
+### Using uv (Recommended)
+
+[uv](https://docs.astral.sh/uv/) is a fast Python package manager that makes installing and running `papr` simple.
+
+1. Install system dependencies using [homebrew](https://brew.sh/):
+
+```sh
+brew install pygobject3
+```
+
+2. Install `uv` if you haven't already:
+
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+3. Clone the repository:
+
+```sh
+git clone https://github.com/peetzweg/papr.git
+cd papr
+```
+
+4. Install the project with uv:
+
+```sh
+uv sync
+```
+
+5. Run `papr` using uv:
+
+```sh
+uv run papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
+```
+
+Alternatively, activate the virtual environment and run directly:
+
+```sh
+source .venv/bin/activate
+papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
+```
+
+### Mac OS (Manual Installation)
 
 1. Install `git` and `python3` run this in your terminal:
 
@@ -78,7 +126,7 @@ brew install pygobject3
 git clone https://github.com/peetzweg/papr.git
 ```
 
-4. Use `papr` CLI arguments to create your calendar, see [Quick Star Section](https://github.com/peetzweg/papr#quick-start)
+4. Use `papr` CLI arguments to create your calendar, see [Quick Start Section](#quick-start)
 
 ## Layouts
 
