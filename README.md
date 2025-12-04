@@ -10,16 +10,8 @@ Papr currently only produces a PDF output. When you are printing the PDF file ma
 
 ## Quick start
 
-If using uv:
-
 ```sh
-uv run papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
-```
-
-Or if running directly without installation:
-
-```sh
-python3 ./papr/papr.py -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
+papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
 ```
 
 ```sh
@@ -64,9 +56,22 @@ usage: papr.py [-h] [-o OUT] [-A] [-a] [-b BRAND] [-c] [-f FONT [FONT ...]]
 
 ## Installation
 
-### Using uv (Recommended)
+### Homebrew (Recommended)
 
-[uv](https://docs.astral.sh/uv/) is a fast Python package manager that makes installing and running `papr` simple.
+The easiest way to install `papr` on macOS:
+
+```sh
+brew tap peetzweg/tap
+brew install papr
+```
+
+That's it! The `papr` command is now available globally.
+
+Note: First installation takes 3-5 minutes as it compiles dependencies.
+
+### Using uv
+
+[uv](https://docs.astral.sh/uv/) is a fast Python package manager for development.
 
 1. Install system dependencies using [homebrew](https://brew.sh/):
 
@@ -99,14 +104,7 @@ uv sync
 uv run papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
 ```
 
-Alternatively, activate the virtual environment and run directly:
-
-```sh
-source .venv/bin/activate
-papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
-```
-
-### Mac OS (Manual Installation)
+### Manual Installation
 
 1. Install `git` and `python3` run this in your terminal:
 
