@@ -9,8 +9,8 @@ import cairo
 from gi.repository import Pango
 from gi.repository import PangoCairo
 
-from util import metrics
-from util import drawing
+from papr.util import metrics
+from papr.util import drawing
 
 
 def drawCalendar(env):

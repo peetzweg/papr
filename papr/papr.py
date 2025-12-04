@@ -11,10 +11,10 @@ import gi
 gi.require_version('PangoCairo', '1.0')
 from gi.repository import PangoCairo
 
-from util import metrics
-from layouts import classic
-from layouts import column
-from layouts import oneyear
+from papr.util import metrics
+from papr.layouts import classic
+from papr.layouts import column
+from papr.layouts import oneyear
 
 
 def main():
