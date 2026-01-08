@@ -50,9 +50,19 @@ def drawCalendar(env):
     # Use configurable columns
     env.columns = DAYS_PER_ROW
 
-    # Calculate how many rows we need for a full year
+    # Calculate padding to align rows so they end with SAT SUN
+    # Each row should start on Monday (weekday() = 0) and end on Sunday (weekday() = 6)
+    jan1 = datetime.date(env.year, 1, 1)
+    # weekday(): Monday=0, Sunday=6
+    # If Jan 1 is Monday (0), no padding needed
+    # If Jan 1 is Tuesday (1), we need 1 padding cell
+    # If Jan 1 is Sunday (6), we need 6 padding cells
+    env.padding_cells = jan1.weekday()
+
+    # Calculate how many rows we need for a full year (including padding)
     year_days = 366 if calendar.isleap(env.year) else 365
-    env.rows = math.ceil(year_days / env.columns)
+    total_cells = year_days + env.padding_cells
+    env.rows = math.ceil(total_cells / env.columns)
 
     # Available width and height after margins (landscape: height is page width)
     available_width = env.height - (2 * env.safety)
@@ -74,6 +84,7 @@ def drawCalendar(env):
     env.day_text_size = DAY_TEXT_FONT_SIZE
     env.month_label_size = MONTH_LABEL_FONT_SIZE
 
+    logging.debug("Padding cells: %s (Jan 1 is %s)", env.padding_cells, jan1.strftime("%A"))
     logging.debug("Cell size: %s x %s mm", env.cell_width / metrics.MM, env.cell_height / metrics.MM)
     logging.debug("Grid: %s columns x %s rows", env.columns, env.rows)
 
@@ -85,14 +96,18 @@ def drawCalendar(env):
     surface = cairo.PDFSurface(env.out, env.height, env.width)
     cr = cairo.Context(surface)
 
+    # Draw the year in the padding space (if there is padding)
+    if env.padding_cells > 0:
+        drawYearLabel(cr, env)
+
     # Draw all days of the year
     date = datetime.date(env.year, 1, 1)
     ONE_DAY = datetime.timedelta(days=1)
-    day_index = 0
+    cell_index = env.padding_cells  # Start after padding
 
     while date.year == env.year:
-        col = day_index % env.columns
-        row = day_index // env.columns
+        col = cell_index % env.columns
+        row = cell_index // env.columns
 
         x = env.offset_x + (col * env.cell_width)
         y = env.offset_y + (row * env.cell_height)
@@ -103,9 +118,47 @@ def drawCalendar(env):
         drawDay(cr, env, x, y, date, is_month_start)
 
         date += ONE_DAY
-        day_index += 1
+        cell_index += 1
 
     logging.info("Finished drawing Calendar!")
+
+
+def drawYearLabel(cr, env):
+    """Draw the year in big letters in the padding space at the start."""
+    with drawing.restoring_transform(cr):
+        year_str = str(env.year)
+
+        # Calculate the area available for the year label (the padding cells)
+        padding_width = env.padding_cells * env.cell_width
+        padding_height = env.cell_height
+
+        # Find the largest font size that fits
+        font_size = int(padding_height * 0.8)
+        font = Pango.FontDescription("%s bold %s" % (env.font, font_size))
+
+        # Measure text
+        temp_layout = drawing.create_layout_with_kerning(cr)
+        temp_layout.set_font_description(font)
+        temp_layout.set_text(year_str, -1)
+        text_width, text_height = temp_layout.get_pixel_size()
+
+        # Reduce font size if text is too wide
+        while text_width > padding_width * 0.9 and font_size > 10:
+            font_size -= 2
+            font = Pango.FontDescription("%s bold %s" % (env.font, font_size))
+            temp_layout.set_font_description(font)
+            text_width, text_height = temp_layout.get_pixel_size()
+
+        # Position: left-aligned in the padding area, vertically centered
+        x = env.offset_x + (padding_width - text_width) / 2
+        y = env.offset_y + (padding_height - text_height) / 2
+
+        # Draw the year
+        cr.move_to(x, y)
+        with drawing.layout(cr) as layout:
+            layout.set_font_description(font)
+            layout.set_text(year_str, -1)
+            cr.set_source_rgb(0.2, 0.2, 0.2)
 
 
 def drawDay(cr, env, x, y, date, is_month_start):
