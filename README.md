@@ -20,6 +20,28 @@ Or using uv (from the project directory):
 uv run papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
 ```
 
+## Development mode (uv only)
+
+For development, watch for file changes and automatically regenerate the PDF (like `npm run dev`):
+
+```sh
+# First, sync with dev dependencies (like npm install)
+uv sync
+
+# Then run in watch mode
+uv run python -m papr.dev -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
+```
+
+The dev mode will:
+- Run the command once immediately
+- Watch for changes in the papr source files
+- Automatically rerun when you save changes
+- Clear the console between runs for clean output
+
+Press `Ctrl+C` to stop watching.
+
+**Note:** This feature is only available when developing with uv and won't be included in Homebrew installations.
+
 ```sh
 usage: papr.py [-h] [-o OUT] [-A] [-a] [-b BRAND] [-c] [-f FONT [FONT ...]]
                    [-l LOCALE] [-m MONTH] [-y YEAR]
