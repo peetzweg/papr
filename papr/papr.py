@@ -54,7 +54,7 @@ def main():
                         help="specify the year the calendar should start, default is the current year (" + str(td.year) + ").", default=td.year)
 
     # currently supported sizes of paper
-    paperSizes = ("A5", "A4", "A3", "A2", "A1", "A0", "USLetter")
+    paperSizes = ("A5", "A4", "A3", "A2", "A1", "A0", "USLetter", "USTabloid", "USLedger")
     parser.add_argument("-p", "--paper", choices=paperSizes,
                         help="choose which paper dimensions should be used " + str(paperSizes) + " default is A4", default="A4")
 
@@ -109,6 +109,12 @@ def main():
     elif environment.paper == "USLetter":
         environment.width = 8.5 * metrics.INCH
         environment.height = 11.0 * metrics.INCH
+    elif environment.paper == "USTabloid":
+        environment.width = 11.0 * metrics.INCH
+        environment.height = 17.0 * metrics.INCH
+    elif environment.paper == "USLedger":
+        environment.width = 11.0 * metrics.INCH
+        environment.height = 17.0 * metrics.INCH
 
 
     # Setup fonts
