@@ -10,8 +10,14 @@ Papr currently only produces a PDF output. When you are printing the PDF file ma
 
 ## Quick start
 
+After installing via Homebrew:
 ```sh
 papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
+```
+
+Or using uv (from the project directory):
+```sh
+uv run papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
 ```
 
 ```sh
@@ -122,9 +128,16 @@ brew install pygobject3
 
 ```sh
 git clone https://github.com/peetzweg/papr.git
+cd papr
 ```
 
-4. Use `papr` CLI arguments to create your calendar, see [Quick Start Section](#quick-start)
+4. Run using Python module syntax:
+
+```sh
+python3 -m papr.papr -y 2023 -m 2 -f='Avenir Next' -p A3 oneyear
+```
+
+See [Quick Start Section](#quick-start) for more CLI examples.
 
 ## Layouts
 

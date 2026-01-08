@@ -15,3 +15,6 @@ dependencies = [
 
 [project.scripts]
 papr = "papr.papr:main"
+
+[tool.uv]
+package = true
