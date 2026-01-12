@@ -10,24 +10,24 @@ from contextlib import contextmanager
 def create_surface(filename, width, height):
     """
     Create a Cairo surface based on the output file extension.
-    
+
     Supports:
     - .pdf: PDFSurface (default)
     - .svg: SVGSurface
-    
+
     Both surfaces use the same coordinate system (points) and produce
     visually identical output for the same drawing commands.
-    
+
     Args:
         filename: Output file path (format detected from extension)
         width: Surface width in points
         height: Surface height in points
-    
+
     Returns:
         A Cairo surface (PDFSurface or SVGSurface)
     """
     ext = os.path.splitext(filename)[1].lower()
-    
+
     if ext == '.svg':
         logging.debug("Creating SVG surface: %s", filename)
         surface = cairo.SVGSurface(filename, width, height)
@@ -38,7 +38,13 @@ def create_surface(filename, width, height):
     else:
         # Default to PDF for .pdf or any other extension
         logging.debug("Creating PDF surface: %s", filename)
-        return cairo.PDFSurface(filename, width, height)
+        surface = cairo.PDFSurface(filename, width, height)
+        # Set fallback resolution to 1200 DPI for high-quality printing
+        # This affects any rasterized elements (e.g., transparency effects)
+        # Vector elements (text, lines, shapes) are resolution-independent
+        surface.set_fallback_resolution(1200.0, 1200.0)
+        logging.debug("PDF fallback resolution set to 1200 DPI for high-quality printing")
+        return surface
 
 
 def create_layout_with_kerning(cr):
