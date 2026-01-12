@@ -29,7 +29,7 @@ def drawCalendar(env):
     logging.debug("width = %sp/%scm, height = %sp/%scm", env.height,
                   env.height / metrics.CM, env.width, env.width / metrics.CM)
 
-    surface = cairo.PDFSurface(env.out, env.height, env.width)
+    surface = drawing.create_surface(env.out, env.height, env.width)
     cr = cairo.Context(surface)
 
     # draw first month

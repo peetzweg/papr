@@ -24,7 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description='Create a Calendar')
 
     parser.add_argument("-o", "--out", dest="out",
-                        help="specify output file", default="out.pdf")
+                        help="specify output file (format detected from extension: .pdf or .svg)", default="out.pdf")
 
     parser.add_argument("-A", "--abbreviate_all", action="store_true",
                         help="use abbreviations for weekdays and months", default=False)

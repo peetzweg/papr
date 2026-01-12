@@ -26,7 +26,7 @@ def drawCalendar(env):
     logging.debug("Creating Cario Surface and Contex")
     logging.debug("width = %sp/%scm, height = %sp/%scm", env.height,
                   env.height / metrics.CM, env.width, env.width / metrics.CM)
-    surface = cairo.PDFSurface(env.out, env.height, env.width)
+    surface = drawing.create_surface(env.out, env.height, env.width)
     cr = cairo.Context(surface)
 
     date = datetime.date(env.year, env.month, 1)

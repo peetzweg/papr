@@ -15,7 +15,7 @@ from papr.util import drawing
 
 def drawCalendar(env):
     logging.debug(
-        "Adding aditional information to enviroment specific to this cal style")
+        "Adding additional information to environment specific to this cal style")
     env.font_size = 6
     env.line_width = 0.01 * metrics.CM
     env.row_width = (env.height - (13.0 * env.safety)) / 12.0
@@ -24,10 +24,10 @@ def drawCalendar(env):
     logging.debug('row is %smm/%spx wide', env.row_width / metrics.MM, env.row_width)
     logging.debug('row is %smm/%spx high', env.row_height / metrics.MM, env.row_height)
 
-    logging.debug("Creating Cario Surface and Context")
+    logging.debug("Creating Cairo Surface and Context")
     logging.debug("width = %sp/%scm, height = %sp/%scm", env.height,
                   env.height / metrics.CM, env.width, env.width / metrics.CM)
-    surface = cairo.PDFSurface(env.out, env.height, env.width)
+    surface = drawing.create_surface(env.out, env.height, env.width)
     cr = cairo.Context(surface)
 
     date = datetime.date(env.year, env.month, 1)
@@ -68,7 +68,7 @@ def drawMonthTitle(cr, env, date):
             # style = "%B"
             # if(env.abbreviate_all):
             #     style = "%b"
-            monthString = date.strftime(style)
+            monthString = date.strftime(style).upper()
 
             layout.set_text(monthString, -1)
             xOffset = (env.row_width - layout.get_pixel_size()[0]) / 2
@@ -90,17 +90,21 @@ def drawDay(cr, env, date):
         if(date.isoweekday() >= 6):
             cr.set_source_rgba(0.90, 0.90, 0.90, 1.0)
             cr.rectangle(0, 0, env.row_width, env.row_height)
+
             cr.fill()
 
         # stroke the box
         cr.set_source_rgba(0, 0, 0, 1.0)
         cr.set_line_width(env.line_width)
-        cr.rectangle(0, 0, env.row_width, env.row_height)
+
+        # cr.rectangle(0, 0, env.row_width, env.row_height)
+        cr.move_to(0, env.row_height)
+        cr.line_to(env.row_width, env.row_height)
         cr.stroke()
 
         daySize = math.floor(env.row_height * 0.25)
-        numberSize = math.floor(env.row_height * 0.5)
-        yOffset = (env.row_height* 0.25) / 2
+        numberSize = math.floor(env.row_height * 0.4)
+        yOffset = (env.row_height* 0.25) / 4
 
         dayFont = Pango.FontDescription("%s %s" % (env.font, daySize)) # day text is way smaller than number
         numberFont = Pango.FontDescription("%s %s" % (env.font, numberSize))
@@ -110,22 +114,27 @@ def drawDay(cr, env, date):
         #     style = "%a"
         weekdayString = "%s" % (date.strftime(style))
 
+
         with drawing.restoring_transform(cr):
             with drawing.layout(cr) as numberLayout:
+
+                xOffset =  0
+                yOffset = (env.row_height - numberSize)/2
+
+                cr.translate(xOffset, yOffset)
                 numberLayout.set_font_description(numberFont)
                 numberLayout.set_text("%s" % date.day, -1) # Number
 
-                xOffset = math.ceil((env.row_width / 8)  - (numberLayout.get_pixel_size()[0] / 2))
-                # yOffset = math.floor((env.row_height - numberSize - daySize - (daySize/2)) / 2)
-                numberOffset = yOffset + ((numberSize - numberLayout.get_pixel_size()[1])/2)
-                cr.translate(xOffset, numberOffset)
 
         with drawing.restoring_transform(cr):
             with drawing.layout(cr) as dayLayout:
-                dayLayout.set_font_description(dayFont)
-                dayLayout.set_text(weekdayString, -1) # Weekday
 
-                xOffset = math.ceil((env.row_width / 8)  - (dayLayout.get_pixel_size()[0] / 2))
-                yOffset = env.row_height - yOffset - daySize
+
+                xOffset = numberLayout.get_pixel_size()[0] * 1.025
+                yOffset = (env.row_height - numberSize)/2 + (daySize*0.8)
+
                 cr.translate(xOffset, yOffset)
+                dayLayout.set_font_description(dayFont)
+                dayLayout.set_text(weekdayString[0], -1) # Weekday
+
 

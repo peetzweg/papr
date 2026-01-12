@@ -93,7 +93,7 @@ def drawCalendar(env):
                   env.height / metrics.CM, env.width, env.width / metrics.CM)
 
     # Create landscape PDF
-    surface = cairo.PDFSurface(env.out, env.height, env.width)
+    surface = drawing.create_surface(env.out, env.height, env.width)
     cr = cairo.Context(surface)
 
     # Draw the year in the padding space (if there is padding)
