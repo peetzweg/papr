@@ -1,6 +1,8 @@
 *~
 *.pyc
 *.pdf
+*.svg
+*.png
 .*.swp
 .DS*
 .venv
