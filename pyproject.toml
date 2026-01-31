@@ -16,5 +16,10 @@ dependencies = [
 [project.scripts]
 papr = "papr.papr:main"
 
+[dependency-groups]
+dev = [
+    "watchfiles>=0.18.0",
+]
+
 [tool.uv]
 package = true
