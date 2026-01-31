@@ -132,7 +132,7 @@ def drawHeader(cr, env, date):
         with drawing.layout(cr) as layout:
             layout.set_font_description(year_font)
             layout.set_text(year_str, -1)
-            cr.set_source_rgb(*env.text_color_muted)
+            cr.set_source_rgb(*env.text_color_primary)
 
         # Draw month (centered in header)
         cr.move_to(month_x, month_y)
