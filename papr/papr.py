@@ -16,6 +16,7 @@ from papr.layouts import classic
 from papr.layouts import column
 from papr.layouts import oneyear
 from papr.layouts import big
+from papr.layouts import month
 
 
 def main():
@@ -65,7 +66,7 @@ def main():
 
     parser.add_argument("-d", "--debug", action="store_true",
                         help="print status and debug messages to stdout", default=False)
-    layouts = ("classic", "column", "oneyear", "big")
+    layouts = ("classic", "column", "oneyear", "big", "month")
     parser.add_argument("layout", choices=layouts, metavar="LAYOUT",
                         help="choose calendar layout: " + str(layouts))
     environment = parser.parse_args()
@@ -139,7 +140,8 @@ def main():
     drawCalendar = {"classic": classic.drawCalendar,
                     "column": column.drawCalendar,
                     "oneyear": oneyear.drawCalendar,
-                    "big": big.drawCalendar}
+                    "big": big.drawCalendar,
+                    "month": month.drawCalendar}
     drawCalendar[environment.layout](environment)
 
     return 0

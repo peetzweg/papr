@@ -1,9 +1,18 @@
 #!/bin/bash
 
+# Set libffi paths for pygobject compilation (required on macOS)
+export LDFLAGS="-L/opt/homebrew/opt/libffi/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/libffi/include"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/libffi/lib/pkgconfig"
+
+# Prevent Python from using cached bytecode (ensures latest source is always used)
+export PYTHONDONTWRITEBYTECODE=1
+
 # Configuration arrays - add/remove values as needed
 years=(2026)
-months=(1 2 3 4 5 6 7 8 9 10 11 12)
-layouts=("big")
+# months=(1 2 3 4 5 6 7 8 9 10 11 12)
+months=(1 2 )
+layouts=("month")
 fonts=("Avenir Next")
 locales=("en_US")
 sizes=("A3" "USLedger")
