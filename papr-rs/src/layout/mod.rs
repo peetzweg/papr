@@ -2,6 +2,7 @@ use crate::canvas::Canvas;
 use crate::config::{Config, Orientation, PageSetup};
 
 pub mod column;
+pub mod oneyear;
 
 /// Every layout implements this trait.
 pub trait Layout {
@@ -13,12 +14,13 @@ pub trait Layout {
 }
 
 /// All available layout names.
-pub const LAYOUT_NAMES: &[&str] = &["column"];
+pub const LAYOUT_NAMES: &[&str] = &["column", "oneyear"];
 
 /// Look up a layout by name.
 pub fn get_layout(name: &str) -> Option<Box<dyn Layout>> {
     match name {
         "column" => Some(Box::new(column::ColumnLayout)),
+        "oneyear" => Some(Box::new(oneyear::OneYearLayout)),
         _ => None,
     }
 }
