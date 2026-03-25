@@ -1,0 +1,12 @@
+[package]
+name = "papr"
+version = "0.1.0"
+edition = "2024"
+description = "Generate printable calendar PDFs and SVGs"
+
+[dependencies]
+cairo-rs = { version = "0.21", features = ["pdf", "svg", "v1_16"] }
+pango = "0.21"
+pangocairo = "0.21"
+clap = { version = "4", features = ["derive"] }
+chrono = "0.4"
