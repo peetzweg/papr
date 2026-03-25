@@ -1,0 +1,21 @@
+[package]
+name = "papr"
+version = "2.0.0"
+edition = "2024"
+description = "Generate printable calendar PDFs and SVGs"
+license = "MIT"
+repository = "https://github.com/peetzweg/papr"
+homepage = "https://peet.sh/"
+keywords = ["calendar", "pdf", "svg", "print"]
+categories = ["command-line-utilities"]
+
+[[bin]]
+name = "papr"
+path = "src/main.rs"
+
+[dependencies]
+cairo-rs = { version = "0.21", features = ["pdf", "svg", "v1_16"] }
+pango = "0.21"
+pangocairo = "0.21"
+clap = { version = "4", features = ["derive"] }
+chrono = "0.4"
