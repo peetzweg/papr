@@ -54,12 +54,17 @@ for layout in big classic column month oneyear; do
 done
 
 echo ""
-rm -rf "$DIR"
+echo "Output kept at: $DIR"
+echo "  python_*.png  — Python reference"
+echo "  rust_*.png    — Rust output"
+echo "  diff_*.png    — Pixel diff (red = different)"
 
 if [ $FAILED -eq 1 ]; then
+  echo ""
   echo "FAILED: Some layouts exceed ${THRESHOLD}% pixel difference"
   exit 1
 else
+  echo ""
   echo "ALL PASSED: All layouts within ${THRESHOLD}% pixel difference"
   exit 0
 fi
