@@ -504,7 +504,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "papr"
+name = "papr-cli"
 version = "2.0.0"
 dependencies = [
  "cairo-rs",
