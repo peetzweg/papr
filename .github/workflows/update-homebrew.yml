@@ -34,7 +34,6 @@ jobs:
         id: checksums
         run: |
           echo "arm=$(awk '{print $1}' checksums/papr-aarch64-apple-darwin.tar.gz.sha256)" >> "$GITHUB_OUTPUT"
-          echo "intel=$(awk '{print $1}' checksums/papr-x86_64-apple-darwin.tar.gz.sha256)" >> "$GITHUB_OUTPUT"
 
       - name: Checkout homebrew-tap
         uses: actions/checkout@v4
@@ -48,7 +47,6 @@ jobs:
           VERSION: ${{ steps.release.outputs.version }}
           TAG: ${{ steps.release.outputs.tag }}
           ARM_SHA: ${{ steps.checksums.outputs.arm }}
-          INTEL_SHA: ${{ steps.checksums.outputs.intel }}
         run: |
           BASE_URL="https://github.com/peetzweg/papr/releases/download/${TAG}"
 
@@ -60,20 +58,16 @@ jobs:
             version "${VERSION}"
 
             on_macos do
-              if Hardware::CPU.arm?
-                url "${BASE_URL}/papr-aarch64-apple-darwin.tar.gz"
-                sha256 "${ARM_SHA}"
-              else
-                url "${BASE_URL}/papr-x86_64-apple-darwin.tar.gz"
-                sha256 "${INTEL_SHA}"
-              end
+              url "${BASE_URL}/papr-aarch64-apple-darwin.tar.gz"
+              sha256 "${ARM_SHA}"
             end
 
+            depends_on :macos
             depends_on "pango"
             depends_on "cairo"
 
             def install
-              bin.install "papr-#{Hardware::CPU.arm? ? "aarch64-apple-darwin" : "x86_64-apple-darwin"}" => "papr"
+              bin.install "papr-aarch64-apple-darwin" => "papr"
             end
 
             test do
