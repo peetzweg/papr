@@ -1,0 +1,94 @@
+name: Update Homebrew Tap
+
+on:
+  workflow_run:
+    workflows: ["Build Binaries"]
+    types: [completed]
+
+jobs:
+  update-tap:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get latest release info
+        id: release
+        run: |
+          TAG=$(gh release list --repo peetzweg/papr --limit 1 --json tagName -q '.[0].tagName')
+          VERSION=${TAG#v}
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download checksums
+        run: |
+          gh release download ${{ steps.release.outputs.tag }} \
+            --repo peetzweg/papr \
+            --pattern "*.sha256" \
+            --dir checksums
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read checksums
+        id: checksums
+        run: |
+          echo "arm=$(awk '{print $1}' checksums/papr-aarch64-apple-darwin.tar.gz.sha256)" >> "$GITHUB_OUTPUT"
+          echo "intel=$(awk '{print $1}' checksums/papr-x86_64-apple-darwin.tar.gz.sha256)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout homebrew-tap
+        uses: actions/checkout@v4
+        with:
+          repository: peetzweg/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: homebrew-tap
+
+      - name: Update formula
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+          TAG: ${{ steps.release.outputs.tag }}
+          ARM_SHA: ${{ steps.checksums.outputs.arm }}
+          INTEL_SHA: ${{ steps.checksums.outputs.intel }}
+        run: |
+          BASE_URL="https://github.com/peetzweg/papr/releases/download/${TAG}"
+
+          cat > homebrew-tap/Formula/papr.rb <<EOF
+          class Papr < Formula
+            desc "Generate printable calendar PDFs and SVGs"
+            homepage "https://peet.sh/"
+            license "MIT"
+            version "${VERSION}"
+
+            on_macos do
+              if Hardware::CPU.arm?
+                url "${BASE_URL}/papr-aarch64-apple-darwin.tar.gz"
+                sha256 "${ARM_SHA}"
+              else
+                url "${BASE_URL}/papr-x86_64-apple-darwin.tar.gz"
+                sha256 "${INTEL_SHA}"
+              end
+            end
+
+            depends_on "pango"
+            depends_on "cairo"
+
+            def install
+              bin.install "papr-#{Hardware::CPU.arm? ? "aarch64-apple-darwin" : "x86_64-apple-darwin"}" => "papr"
+            end
+
+            test do
+              assert_match version.to_s, shell_output("#{bin}/papr --version")
+            end
+          end
+          EOF
+          # Remove leading whitespace from heredoc
+          sed -i 's/^          //' homebrew-tap/Formula/papr.rb
+
+      - name: Commit and push formula
+        run: |
+          cd homebrew-tap
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/papr.rb
+          git diff --staged --quiet || git commit -m "papr ${{ steps.release.outputs.tag }}"
+          git push
