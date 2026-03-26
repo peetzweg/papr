@@ -2,8 +2,8 @@ use chrono::{Datelike, NaiveDate};
 
 use crate::calendar;
 use crate::canvas::{Canvas, Font};
-use crate::config::{Config, Orientation, PageSetup, MM};
-use crate::style::{defaults, Color};
+use crate::config::{Config, MM, Orientation, PageSetup};
+use crate::style::{Color, defaults};
 
 pub struct MonthLayout;
 
@@ -41,7 +41,15 @@ impl super::Layout for MonthLayout {
         draw_header(canvas, config, offset_x, header_y, avail_w, header_height);
         draw_weekday_headers(canvas, config, offset_x, weekday_y, cell_w, header_row_h);
         draw_days_grid(
-            canvas, config, date, offset_x, grid_y, cell_w, cell_h, line_width, day_font_size,
+            canvas,
+            config,
+            date,
+            offset_x,
+            grid_y,
+            cell_w,
+            cell_h,
+            line_width,
+            day_font_size,
         );
     }
 }
@@ -79,7 +87,13 @@ fn draw_header(
         let year_y = (month_y - gap - year_m.height).max(header_y);
         let year_x = center_x - year_m.width / 2.0;
 
-        canvas.draw_text(&year_str, year_x, year_y, &year_font, defaults::TEXT_PRIMARY);
+        canvas.draw_text(
+            &year_str,
+            year_x,
+            year_y,
+            &year_font,
+            defaults::TEXT_PRIMARY,
+        );
         canvas.draw_text(
             &month_str,
             month_x,

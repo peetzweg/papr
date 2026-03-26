@@ -4,7 +4,7 @@ use chrono::{Datelike, NaiveDate};
 
 use crate::calendar;
 use crate::canvas::{Canvas, Font};
-use crate::config::{Config, Orientation, PageSetup, CM};
+use crate::config::{CM, Config, Orientation, PageSetup};
 use crate::style::Color;
 
 pub struct ClassicLayout;
@@ -29,8 +29,17 @@ impl super::Layout for ClassicLayout {
             c.translate(page.width, page.height / 2.0);
             c.rotate(PI);
             draw_month(
-                c, config, canvas, year_to_draw, month_to_draw, page, page_width, cell_width,
-                cell_height, line_width, font_size,
+                c,
+                config,
+                canvas,
+                year_to_draw,
+                month_to_draw,
+                page,
+                page_width,
+                cell_width,
+                cell_height,
+                line_width,
+                font_size,
             );
         });
 
@@ -46,8 +55,17 @@ impl super::Layout for ClassicLayout {
             }
 
             draw_month(
-                c, config, canvas, year_to_draw, month_to_draw, page, page_width, cell_width,
-                cell_height, line_width, font_size,
+                c,
+                config,
+                canvas,
+                year_to_draw,
+                month_to_draw,
+                page,
+                page_width,
+                cell_width,
+                cell_height,
+                line_width,
+                font_size,
             );
         });
 
@@ -77,14 +95,7 @@ impl super::Layout for ClassicLayout {
     }
 }
 
-fn draw_brand_text(
-    _c: &Canvas,
-    canvas: &Canvas,
-    config: &Config,
-    x: f64,
-    y: f64,
-    font_size: f64,
-) {
+fn draw_brand_text(_c: &Canvas, canvas: &Canvas, config: &Config, x: f64, y: f64, font_size: f64) {
     let parts: Vec<&str> = config.brand.splitn(2, ' ').collect();
     if parts.is_empty() {
         return;
@@ -129,7 +140,16 @@ fn draw_month(
     let mut date = NaiveDate::from_ymd_opt(year, month, 1).unwrap();
 
     // Month title in first cell
-    draw_month_title(c, canvas, config, page.margin, page.margin, cell_width, cell_height, date);
+    draw_month_title(
+        c,
+        canvas,
+        config,
+        page.margin,
+        page.margin,
+        cell_width,
+        cell_height,
+        date,
+    );
 
     let mut cells_on_page: u32 = 1;
     let cells_on_page_max: u32 = 8;
@@ -141,7 +161,18 @@ fn draw_month(
         let x = page.margin + (page_num as f64 * page_width) + (column as f64 * cell_width);
         let y = page.margin + (row as f64 * cell_height);
 
-        draw_day(c, canvas, config, x, y, cell_width, cell_height, line_width, font_size, date);
+        draw_day(
+            c,
+            canvas,
+            config,
+            x,
+            y,
+            cell_width,
+            cell_height,
+            line_width,
+            font_size,
+            date,
+        );
 
         cells_on_page += 1;
         row += 1;
@@ -232,7 +263,13 @@ fn draw_day(
     } else {
         Color::rgb(0.0, 0.0, 0.0)
     };
-    canvas.draw_text(parts[0], x + offset_x, y + offset_y, &number_font, number_color);
+    canvas.draw_text(
+        parts[0],
+        x + offset_x,
+        y + offset_y,
+        &number_font,
+        number_color,
+    );
 
     // Day name
     if parts.len() > 1 {

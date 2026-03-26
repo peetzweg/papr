@@ -2,7 +2,7 @@ use chrono::{Datelike, NaiveDate};
 
 use crate::calendar;
 use crate::canvas::{Canvas, Font};
-use crate::config::{Config, Orientation, PageSetup, MM};
+use crate::config::{Config, MM, Orientation, PageSetup};
 use crate::style::Color;
 
 /// Number of days per row (columns).
@@ -78,8 +78,16 @@ impl super::Layout for BigLayout {
         // Draw year label in initial padding
         if padding_cells > 0 {
             draw_year_label(
-                canvas, config, config.year, 0, padding_cells, columns, cell_width, cell_height,
-                offset_x, offset_y,
+                canvas,
+                config,
+                config.year,
+                0,
+                padding_cells,
+                columns,
+                cell_width,
+                cell_height,
+                offset_x,
+                offset_y,
             );
         }
 
@@ -123,7 +131,15 @@ impl super::Layout for BigLayout {
             let is_month_start = date.day() == 1;
 
             draw_day(
-                canvas, config, x, y, cell_width, cell_height, line_width, flag_pole_width, date,
+                canvas,
+                config,
+                x,
+                y,
+                cell_width,
+                cell_height,
+                line_width,
+                flag_pole_width,
+                date,
                 is_month_start,
             );
 
@@ -207,7 +223,13 @@ fn draw_day(
 
         // Weekend background
         if calendar::is_weekend(date) {
-            c.fill_rect(0.0, 0.0, cell_width, cell_height, Color::rgb(0.92, 0.92, 0.92));
+            c.fill_rect(
+                0.0,
+                0.0,
+                cell_width,
+                cell_height,
+                Color::rgb(0.92, 0.92, 0.92),
+            );
         }
 
         // Cell border
@@ -218,7 +240,16 @@ fn draw_day(
 
         // Month label flag on first day
         if is_month_start {
-            draw_month_label(c, canvas, config, date, cell_height, line_width, flag_pole_width, text_padding);
+            draw_month_label(
+                c,
+                canvas,
+                config,
+                date,
+                cell_height,
+                line_width,
+                flag_pole_width,
+                text_padding,
+            );
         }
     });
 }
@@ -247,7 +278,13 @@ fn draw_day_info(
     let start_x = cell_width - padding - total_width;
 
     canvas.with_save(|_| {
-        c.draw_text(&weekday_str, start_x, padding, &font, Color::rgb(0.4, 0.4, 0.4));
+        c.draw_text(
+            &weekday_str,
+            start_x,
+            padding,
+            &font,
+            Color::rgb(0.4, 0.4, 0.4),
+        );
         c.draw_text(
             &day_str,
             start_x + weekday_m.width + gap,

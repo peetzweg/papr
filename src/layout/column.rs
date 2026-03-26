@@ -2,7 +2,7 @@ use chrono::{Datelike, NaiveDate};
 
 use crate::calendar;
 use crate::canvas::{Canvas, Font};
-use crate::config::{Config, Orientation, PageSetup, CM};
+use crate::config::{CM, Config, Orientation, PageSetup};
 use crate::style::Color;
 
 pub struct ColumnLayout;
@@ -32,7 +32,9 @@ impl super::Layout for ColumnLayout {
                     // Days
                     let starting_month = date.month();
                     while date.month() == starting_month {
-                        draw_day(c, config, &page, date, row_width, row_height, font_size, line_width);
+                        draw_day(
+                            c, config, &page, date, row_width, row_height, font_size, line_width,
+                        );
                         date = date.succ_opt().unwrap();
                     }
                 });
@@ -83,8 +85,7 @@ fn draw_day(
     line_width: f64,
 ) {
     canvas.with_save(|c| {
-        let mut y_offset =
-            page.margin + 2.0 * row_height + (date.day0() as f64 * row_height);
+        let mut y_offset = page.margin + 2.0 * row_height + (date.day0() as f64 * row_height);
 
         // Folding margin after day 15
         if date.day() > 15 {
@@ -95,11 +96,24 @@ fn draw_day(
 
         // Weekend background
         if calendar::is_weekend(date) {
-            c.fill_rect(0.0, 0.0, row_width, row_height, Color::rgb(0.90, 0.90, 0.90));
+            c.fill_rect(
+                0.0,
+                0.0,
+                row_width,
+                row_height,
+                Color::rgb(0.90, 0.90, 0.90),
+            );
         }
 
         // Cell border
-        c.stroke_rect(0.0, 0.0, row_width, row_height, Color::rgb(0.0, 0.0, 0.0), line_width);
+        c.stroke_rect(
+            0.0,
+            0.0,
+            row_width,
+            row_height,
+            Color::rgb(0.0, 0.0, 0.0),
+            line_width,
+        );
 
         // Day text: "1 Monday" or "1 Mon"
         let day_font = Font::new(&config.font, font_size);
