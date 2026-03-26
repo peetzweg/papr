@@ -1,6 +1,7 @@
 use chrono::{Datelike, NaiveDate, Weekday};
 
 /// Iterate over every day in a month.
+#[allow(dead_code)]
 pub fn days_in_month(year: i32, month: u32) -> impl Iterator<Item = NaiveDate> {
     let first = NaiveDate::from_ymd_opt(year, month, 1).unwrap();
     let count = last_day_of_month(year, month) as usize;
@@ -8,6 +9,7 @@ pub fn days_in_month(year: i32, month: u32) -> impl Iterator<Item = NaiveDate> {
 }
 
 /// Iterate over a 12-month span starting at (year, month).
+#[allow(dead_code)]
 pub fn year_span(year: i32, start_month: u32) -> impl Iterator<Item = NaiveDate> {
     let first = NaiveDate::from_ymd_opt(year, start_month, 1).unwrap();
     let (end_year, end_month) = if start_month == 1 {

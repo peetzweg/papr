@@ -2,7 +2,7 @@ use chrono::{Datelike, NaiveDate};
 
 use crate::calendar;
 use crate::canvas::{Canvas, Font};
-use crate::config::{Config, Orientation, PageSetup, CM};
+use crate::config::{CM, Config, Orientation, PageSetup};
 use crate::style::Color;
 
 pub struct OneYearLayout;
@@ -34,7 +34,9 @@ impl super::Layout for OneYearLayout {
                 // Days
                 let starting_month = date.month();
                 while date.month() == starting_month {
-                    draw_day(c, config, date, row_width, row_height, font_size, line_width, page);
+                    draw_day(
+                        c, config, date, row_width, row_height, font_size, line_width, page,
+                    );
                     date = date.succ_opt().unwrap();
                 }
             });
@@ -61,7 +63,13 @@ fn draw_month_title(
         let x_offset = (row_width - m.width) / 2.0;
         let y_offset = (page.margin + row_height) - m.height;
 
-        c.draw_text(&month_str, x_offset, y_offset, &font, Color::rgb(0.0, 0.0, 0.0));
+        c.draw_text(
+            &month_str,
+            x_offset,
+            y_offset,
+            &font,
+            Color::rgb(0.0, 0.0, 0.0),
+        );
     });
 }
 
@@ -81,7 +89,13 @@ fn draw_day(
 
         // Weekend background
         if calendar::is_weekend(date) {
-            c.fill_rect(0.0, 0.0, row_width, row_height, Color::rgb(0.90, 0.90, 0.90));
+            c.fill_rect(
+                0.0,
+                0.0,
+                row_width,
+                row_height,
+                Color::rgb(0.90, 0.90, 0.90),
+            );
         }
 
         // Bottom line (not full rectangle stroke, matching Python)

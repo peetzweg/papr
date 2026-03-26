@@ -13,6 +13,7 @@ impl Color {
 }
 
 /// Shared visual constants used by all layouts.
+#[allow(dead_code)]
 pub mod defaults {
     use super::Color;
 

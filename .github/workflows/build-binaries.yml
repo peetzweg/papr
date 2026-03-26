@@ -1,0 +1,56 @@
+name: Build Binaries
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            os: macos-14
+          - target: x86_64-apple-darwin
+            os: macos-13
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install pango cairo
+
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libpango1.0-dev libcairo2-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Package binary
+        run: |
+          ARTIFACT_NAME="papr-${{ matrix.target }}"
+          mkdir -p dist
+          cp target/${{ matrix.target }}/release/papr dist/${ARTIFACT_NAME}
+          cd dist
+          tar czf ${ARTIFACT_NAME}.tar.gz ${ARTIFACT_NAME}
+          shasum -a 256 ${ARTIFACT_NAME}.tar.gz > ${ARTIFACT_NAME}.tar.gz.sha256
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/papr-${{ matrix.target }}.tar.gz
+            dist/papr-${{ matrix.target }}.tar.gz.sha256

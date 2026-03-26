@@ -90,6 +90,7 @@ impl PageSetup {
 }
 
 /// All user-facing configuration. Immutable after CLI parsing.
+#[allow(dead_code)]
 pub struct Config {
     pub year: i32,
     pub month: u32,

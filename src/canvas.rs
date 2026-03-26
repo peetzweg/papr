@@ -89,15 +89,15 @@ impl Canvas {
             let mut surface = SvgSurface::new(page.width, page.height, Some(path))
                 .map_err(|e| format!("Failed to create SVG surface: {e}"))?;
             surface.set_document_unit(SvgUnit::Pt);
-            let cr = Context::new(&surface)
-                .map_err(|e| format!("Failed to create context: {e}"))?;
+            let cr =
+                Context::new(&surface).map_err(|e| format!("Failed to create context: {e}"))?;
             (cr, Surface::Svg(surface))
         } else if path.ends_with(".pdf") {
             let surface = PdfSurface::new(page.width, page.height, path)
                 .map_err(|e| format!("Failed to create PDF surface: {e}"))?;
             surface.set_fallback_resolution(1200.0, 1200.0);
-            let cr = Context::new(&surface)
-                .map_err(|e| format!("Failed to create context: {e}"))?;
+            let cr =
+                Context::new(&surface).map_err(|e| format!("Failed to create context: {e}"))?;
             (cr, Surface::Pdf(surface))
         } else {
             return Err(format!(
@@ -160,15 +160,7 @@ impl Canvas {
     }
 
     /// Draw a line from (x1,y1) to (x2,y2).
-    pub fn draw_line(
-        &self,
-        x1: f64,
-        y1: f64,
-        x2: f64,
-        y2: f64,
-        color: Color,
-        line_width: f64,
-    ) {
+    pub fn draw_line(&self, x1: f64, y1: f64, x2: f64, y2: f64, color: Color, line_width: f64) {
         self.cr.set_line_width(line_width);
         self.cr.set_source_rgb(color.r, color.g, color.b);
         self.cr.move_to(x1, y1);
@@ -198,6 +190,7 @@ impl Canvas {
     // ---- Page ----
 
     /// Finish the current page and start a new one (PDF only, no-op for SVG).
+    #[allow(dead_code)]
     pub fn show_page(&self) {
         self.cr.show_page().unwrap();
     }
@@ -258,7 +251,11 @@ mod tests {
         );
         let path = "/tmp/papr_test_skeleton.pdf";
         let canvas = Canvas::new(path, &page);
-        assert!(canvas.is_ok(), "Failed to create PDF canvas: {:?}", canvas.err());
+        assert!(
+            canvas.is_ok(),
+            "Failed to create PDF canvas: {:?}",
+            canvas.err()
+        );
         drop(canvas);
         let meta = std::fs::metadata(path).unwrap();
         assert!(meta.len() > 0, "PDF file is empty");
@@ -274,7 +271,11 @@ mod tests {
         );
         let path = "/tmp/papr_test_skeleton.svg";
         let canvas = Canvas::new(path, &page);
-        assert!(canvas.is_ok(), "Failed to create SVG canvas: {:?}", canvas.err());
+        assert!(
+            canvas.is_ok(),
+            "Failed to create SVG canvas: {:?}",
+            canvas.err()
+        );
         drop(canvas);
         let meta = std::fs::metadata(path).unwrap();
         assert!(meta.len() > 0, "SVG file is empty");

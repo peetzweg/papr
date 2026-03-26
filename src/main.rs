@@ -1,3 +1,5 @@
+#![allow(clippy::too_many_arguments)]
+
 use chrono::Datelike;
 use clap::Parser;
 
