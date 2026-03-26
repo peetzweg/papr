@@ -3,7 +3,7 @@ use chrono::{Datelike, NaiveDate};
 use crate::calendar;
 use crate::canvas::{Canvas, Font};
 use crate::config::{Config, MM, Orientation, PageSetup};
-use crate::style::{Color, defaults};
+use crate::style::defaults;
 
 pub struct MonthLayout;
 
@@ -67,8 +67,8 @@ fn draw_header(
         let date = NaiveDate::from_ymd_opt(config.year, config.month, 1).unwrap();
         let month_str = date.format("%b").to_string().to_uppercase();
 
-        let month_font_size = (header_height * 0.5) as f64;
-        let year_font_size = (month_font_size / 5.0) as f64;
+        let month_font_size = header_height * 0.5;
+        let year_font_size = month_font_size / 5.0;
 
         let year_font = Font::new(&config.font, year_font_size).bold();
         let month_font = Font::new(&config.font, month_font_size).bold();

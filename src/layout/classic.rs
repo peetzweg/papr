@@ -22,7 +22,7 @@ impl super::Layout for ClassicLayout {
         let font_size = 6.0;
 
         let mut month_to_draw = config.month;
-        let mut year_to_draw = config.year as i32;
+        let mut year_to_draw = config.year;
 
         // First month: rotated 180°
         canvas.with_save(|c| {

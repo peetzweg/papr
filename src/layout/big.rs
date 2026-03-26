@@ -61,7 +61,7 @@ impl super::Layout for BigLayout {
             padding_cells + total_days
         };
 
-        let rows = (total_cells + columns - 1) / columns;
+        let rows = total_cells.div_ceil(columns);
 
         // Available area (landscape)
         let available_width = page.width - 2.0 * page.margin;
@@ -178,7 +178,7 @@ fn draw_year_label(
         let label_start_y = offset_y + (start_row as f64 * cell_height);
 
         // Find largest font size that fits
-        let mut font_size = (label_height * 0.8) as f64;
+        let mut font_size = label_height * 0.8;
         let font = Font::new(&config.font, font_size).bold();
         let mut m = canvas.measure_text(&year_str, &font);
 

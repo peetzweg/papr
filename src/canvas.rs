@@ -190,6 +190,7 @@ impl Canvas {
     // ---- Page ----
 
     /// Finish the current page and start a new one (PDF only, no-op for SVG).
+    #[allow(dead_code)]
     pub fn show_page(&self) {
         self.cr.show_page().unwrap();
     }
