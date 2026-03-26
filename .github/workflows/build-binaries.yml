@@ -3,6 +3,11 @@ name: Build Binaries
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v2.0.0)"
+        required: true
 
 permissions:
   contents: write
@@ -51,6 +56,7 @@ jobs:
       - name: Upload to release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
           files: |
             dist/papr-${{ matrix.target }}.tar.gz
             dist/papr-${{ matrix.target }}.tar.gz.sha256
