@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/peetzweg/papr/branch/master/graph/badge.svg)](https://codecov.io/gh/peetzweg/papr)
+
 # `papr` - Generate Calendar Stationeries
 
 Command line tool to generate empty calendar templates to print. Outputs PDF and SVG.
