@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## [2.1.1](https://github.com/peetzweg/papr/compare/v2.1.0...v2.1.1) - 2026-04-06
+
+### Fixed
+
+- use HomePage.Root instead of HomePage in landing page MDX
+- bump Node.js to 22 for docs build (vocs requires fs.globSync)
+
+### Other
+
+- add preview images for all layouts and fix image paths
+- Merge pull request #58 from peetzweg/feature-vocs
+- add Vocs documentation site with GitHub Pages deployment
+
 ## [2.1.0](https://github.com/peetzweg/papr/compare/v2.0.0...v2.1.0) - 2026-04-06
 
 ### Added

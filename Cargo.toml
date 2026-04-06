@@ -1,6 +1,6 @@
 [package]
 name = "papr-cli"
-version = "2.1.0"
+version = "2.1.1"
 edition = "2024"
 description = "Generate printable calendar PDFs and SVGs"
 license = "MIT"
