@@ -1,0 +1,87 @@
+# CLI Reference
+
+## Command structure
+
+```
+papr <COMMAND> [OPTIONS]
+```
+
+## Available commands
+
+| Command | Description |
+|---------|-------------|
+| `month` | Single month portrait calendar |
+| `big` | Full year landscape, days flow in rows |
+| `classic` | Two months landscape, columnar layout |
+| `column` | Four months landscape, vertical columns |
+| `oneyear` | Full year on one landscape sheet |
+| `batch` | Generate calendars from a YAML batch config |
+
+## Shared options
+
+These options are available on all layout commands (`month`, `big`, `classic`, `column`, `oneyear`):
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-o, --output <FILE>` | Output file (`.pdf` or `.svg`, detected from extension) | `out.pdf` |
+| `-y, --year <YEAR>` | Calendar year | current year |
+| `-m, --month <MONTH>` | Starting month (1–12) | current month |
+| `-p, --paper <SIZE>` | Paper size | `A4` |
+| `-f, --font <FONT>` | Font family (pass twice for heading + body font) | `Sans` |
+| `-l, --locale <LOCALE>` | Locale for date formatting | `en_US` |
+| `--margin <MM>` | Page margin in millimeters | `5` |
+
+## Paper sizes
+
+| Size | Dimensions (mm) |
+|------|-----------------|
+| A0 | 841 x 1189 |
+| A1 | 594 x 841 |
+| A2 | 420 x 594 |
+| A3 | 297 x 420 |
+| A4 | 210 x 297 |
+| A5 | 148 x 210 |
+| USLetter | 216 x 279 |
+| USTabloid | 279 x 432 |
+| USLedger | 432 x 279 |
+
+Paper size names are case-insensitive.
+
+## Font handling
+
+The `-f, --font` flag accepts any font name recognized by your system's Pango/fontconfig setup.
+
+Pass it **once** to set a single font for everything:
+
+```sh
+papr month -f 'Helvetica' -o calendar.pdf
+```
+
+Pass it **twice** to set separate heading and body fonts. The **first** `-f` sets the heading font, the **second** sets the body font:
+
+```sh
+papr oneyear -f 'Georgia' -f 'Helvetica' -o overview.pdf
+```
+
+:::info
+The dual-font feature is most visible in the `oneyear` layout, where month titles use the heading font.
+:::
+
+## Output format
+
+The output format is auto-detected from the file extension:
+
+- `.pdf` — PDF output via Cairo (1200 DPI)
+- `.svg` — SVG output via Cairo
+
+```sh
+papr month -o calendar.pdf   # PDF
+papr month -o calendar.svg   # SVG
+```
+
+## Layout-specific options
+
+Some layouts accept additional flags. See each layout's page for details:
+
+- [`classic`](/layouts/classic) — abbreviation, branding, colored numbers
+- [`column`](/layouts/column) — abbreviation

@@ -1,0 +1,108 @@
+=== papr ===
+Generate printable calendar PDFs and SVGs
+
+Usage: papr <COMMAND>
+
+Commands:
+  month    Single month portrait calendar
+  big      Full year landscape, days flow in rows
+  classic  Two months landscape, columnar layout
+  column   Four months landscape, vertical columns
+  oneyear  Full year on one landscape sheet
+  batch    Generate calendars from a YAML batch config
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+
+=== papr month ===
+Single month portrait calendar
+
+Usage: papr month [OPTIONS]
+
+Options:
+  -o, --output <OUTPUT>  Output file (.pdf or .svg) [default: out.pdf]
+  -y, --year <YEAR>      Year
+  -m, --month <MONTH>    Starting month (1-12)
+  -p, --paper <PAPER>    Paper size (A5, A4, A3, A2, A1, A0, USLetter, USTabloid, USLedger) [default: A4]
+  -f, --font <FONT>      Font family [default: Sans]
+  -l, --locale <LOCALE>  Locale [default: en_US]
+      --margin <MARGIN>  Page margin in mm [default: 5]
+  -h, --help             Print help
+
+=== papr big ===
+Full year landscape, days flow in rows
+
+Usage: papr big [OPTIONS]
+
+Options:
+  -o, --output <OUTPUT>  Output file (.pdf or .svg) [default: out.pdf]
+  -y, --year <YEAR>      Year
+  -m, --month <MONTH>    Starting month (1-12)
+  -p, --paper <PAPER>    Paper size (A5, A4, A3, A2, A1, A0, USLetter, USTabloid, USLedger) [default: A4]
+  -f, --font <FONT>      Font family [default: Sans]
+  -l, --locale <LOCALE>  Locale [default: en_US]
+      --margin <MARGIN>  Page margin in mm [default: 5]
+  -h, --help             Print help
+
+=== papr classic ===
+Two months landscape, columnar layout
+
+Usage: papr classic [OPTIONS]
+
+Options:
+  -o, --output <OUTPUT>  Output file (.pdf or .svg) [default: out.pdf]
+  -y, --year <YEAR>      Year
+  -m, --month <MONTH>    Starting month (1-12)
+  -p, --paper <PAPER>    Paper size (A5, A4, A3, A2, A1, A0, USLetter, USTabloid, USLedger) [default: A4]
+  -f, --font <FONT>      Font family [default: Sans]
+  -l, --locale <LOCALE>  Locale [default: en_US]
+      --margin <MARGIN>  Page margin in mm [default: 5]
+  -a                     Abbreviate weekdays
+  -A                     Abbreviate weekdays and months
+  -b, --brand <BRAND>    Brand string [default: ""]
+  -c, --color            Color date numbers
+  -h, --help             Print help
+
+=== papr column ===
+Four months landscape, vertical columns
+
+Usage: papr column [OPTIONS]
+
+Options:
+  -o, --output <OUTPUT>  Output file (.pdf or .svg) [default: out.pdf]
+  -y, --year <YEAR>      Year
+  -m, --month <MONTH>    Starting month (1-12)
+  -p, --paper <PAPER>    Paper size (A5, A4, A3, A2, A1, A0, USLetter, USTabloid, USLedger) [default: A4]
+  -f, --font <FONT>      Font family [default: Sans]
+  -l, --locale <LOCALE>  Locale [default: en_US]
+      --margin <MARGIN>  Page margin in mm [default: 5]
+  -a                     Abbreviate weekdays
+  -A                     Abbreviate weekdays and months
+  -h, --help             Print help
+
+=== papr oneyear ===
+Full year on one landscape sheet
+
+Usage: papr oneyear [OPTIONS]
+
+Options:
+  -o, --output <OUTPUT>  Output file (.pdf or .svg) [default: out.pdf]
+  -y, --year <YEAR>      Year
+  -m, --month <MONTH>    Starting month (1-12)
+  -p, --paper <PAPER>    Paper size (A5, A4, A3, A2, A1, A0, USLetter, USTabloid, USLedger) [default: A4]
+  -f, --font <FONT>      Font family [default: Sans]
+  -l, --locale <LOCALE>  Locale [default: en_US]
+      --margin <MARGIN>  Page margin in mm [default: 5]
+  -h, --help             Print help
+
+=== papr batch ===
+Generate calendars from a YAML batch config
+
+Usage: papr batch <CONFIG>
+
+Arguments:
+  <CONFIG>  Path to YAML configuration file
+
+Options:
+  -h, --help  Print help

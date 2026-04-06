@@ -1,0 +1,69 @@
+# Getting Started
+
+## Your first calendar
+
+After [installing papr](/installation), generate a single-month calendar:
+
+```sh
+papr month -o calendar.pdf
+```
+
+This creates a portrait A4 PDF of the current month using the default font. Open it and print it!
+
+## Choosing a layout
+
+papr offers **5 layouts**, each a subcommand:
+
+| Command | Description |
+|---------|-------------|
+| `papr month` | Single month on a portrait page |
+| `papr big` | Full year on a landscape sheet, days in rows |
+| `papr classic` | Two months landscape, designed for back-to-back printing |
+| `papr column` | Four months in vertical columns |
+| `papr oneyear` | Full year as 12 mini-columns |
+
+See the [Layouts overview](/layouts) for visual examples and details.
+
+## Common options
+
+All layout commands share these options:
+
+```sh
+# Set year and month
+papr month -y 2026 -m 4 -o april.pdf
+
+# Change paper size
+papr big -p A3 -o year.pdf
+
+# Custom font
+papr month -f 'Avenir Next' -o calendar.pdf
+
+# SVG output (detected from file extension)
+papr month -o calendar.svg
+
+# Adjust margins (in mm)
+papr month --margin 10 -o calendar.pdf
+
+# Set locale for date formatting
+papr month -l de_DE -o kalender.pdf
+```
+
+See the full [CLI Reference](/cli-reference) for all options.
+
+## PDF vs SVG
+
+papr auto-detects the output format from the file extension:
+
+- `.pdf` — PDF output (default)
+- `.svg` — SVG output
+
+```sh
+papr month -o calendar.pdf   # PDF
+papr month -o calendar.svg   # SVG
+```
+
+## Next steps
+
+- Browse individual [layout pages](/layouts) for detailed arguments and examples
+- Learn about [batch mode](/batch-mode) to generate many calendars at once
+- See the full [CLI reference](/cli-reference) for all shared options and paper sizes

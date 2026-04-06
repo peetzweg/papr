@@ -1,0 +1,62 @@
+# classic
+
+Two months in **landscape** orientation, designed for back-to-back printing.
+
+```sh
+papr classic [OPTIONS]
+```
+
+## Description
+
+The `classic` layout renders two consecutive months on a landscape page using a columnar design. The first month is rotated 180 degrees so that when printed back-to-back, both months read correctly. Each month is arranged in a 2-column, 4-row grid.
+
+This layout supports optional brand text, colored date numbers, and weekday/month name abbreviation.
+
+## Options
+
+In addition to [shared options](/cli-reference#shared-options), `classic` accepts:
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-a` | Abbreviate weekday names (e.g., Mon instead of Monday) | off |
+| `-A` | Abbreviate both weekday and month names | off |
+| `-b, --brand <TEXT>` | Brand string printed on the calendar | `""` |
+| `-c, --color` | Color date numbers red | off |
+
+### Shared options
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-o, --output <FILE>` | Output file (`.pdf` or `.svg`) | `out.pdf` |
+| `-y, --year <YEAR>` | Calendar year | current year |
+| `-m, --month <MONTH>` | Starting month (1–12) | current month |
+| `-p, --paper <SIZE>` | Paper size | `A4` |
+| `-f, --font <FONT>` | Font family | `Sans` |
+| `-l, --locale <LOCALE>` | Locale for date formatting | `en_US` |
+| `--margin <MM>` | Page margin in millimeters | `5` |
+
+## Back-to-back printing
+
+The 180-degree rotation of the first month is intentional: print the PDF double-sided and both months will be right-side up. This makes `classic` ideal for wall calendars or desk calendars.
+
+## Examples
+
+```sh
+# Basic two-month calendar
+papr classic -o classic.pdf -y 2026
+
+# With abbreviated weekdays
+papr classic -o classic.pdf -y 2026 -a
+
+# Fully abbreviated (weekdays + months)
+papr classic -o classic.pdf -y 2026 -A
+
+# With branding and colored numbers
+papr classic -o branded.pdf -y 2026 -b "My Calendar" -c
+
+# Combined: abbreviated, branded, colored, on A3
+papr classic -o wall.pdf -y 2026 -a -b "2026" -c -p A3
+
+# Starting from a specific month
+papr classic -o summer.pdf -y 2026 -m 6 -b "Summer"
+```

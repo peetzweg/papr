@@ -1,0 +1,49 @@
+# month
+
+Single month on a **portrait** page.
+
+```sh
+papr month [OPTIONS]
+```
+
+## Description
+
+The `month` layout renders one calendar month in portrait orientation. The top third of the page shows a large header with the year and month name. The bottom two thirds contain a 7-column grid (Monday through Sunday) with 6 rows for day cells. Week numbers are displayed on Mondays in the top-left corner of each cell.
+
+![papr month layout demo](/demo.jpg)
+
+## Options
+
+This layout uses only the [shared options](/cli-reference#shared-options) — no layout-specific flags.
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-o, --output <FILE>` | Output file (`.pdf` or `.svg`) | `out.pdf` |
+| `-y, --year <YEAR>` | Calendar year | current year |
+| `-m, --month <MONTH>` | Month (1–12) | current month |
+| `-p, --paper <SIZE>` | Paper size | `A4` |
+| `-f, --font <FONT>` | Font family | `Sans` |
+| `-l, --locale <LOCALE>` | Locale for date formatting | `en_US` |
+| `--margin <MM>` | Page margin in millimeters | `5` |
+
+## Examples
+
+```sh
+# Basic usage — current month on A4
+papr month -o calendar.pdf
+
+# Specific month and year
+papr month -o april.pdf -y 2026 -m 4
+
+# Large format with custom font
+papr month -o poster.pdf -p A3 -f 'Avenir Next'
+
+# SVG output
+papr month -o calendar.svg -y 2026 -m 1
+
+# German locale
+papr month -o kalender.pdf -y 2026 -m 3 -l de_DE
+
+# Custom margin
+papr month -o calendar.pdf --margin 10
+```

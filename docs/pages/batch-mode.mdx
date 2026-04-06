@@ -1,0 +1,161 @@
+# Batch Mode
+
+Generate many calendars at once from a single YAML configuration file.
+
+```sh
+papr batch <config.yaml>
+```
+
+## Overview
+
+Batch mode uses **matrix expansion** (similar to GitHub Actions) to generate the Cartesian product of all specified values. This lets you produce dozens of calendar variants from a single config file.
+
+## YAML schema
+
+```yaml
+# Default values applied to every combination
+defaults:
+  year: 2026
+  font: "Avenir Next"
+  paper: A4
+  margin: 5
+
+# Matrix axes — Cartesian product of all lists
+matrix:
+  layout: [month, big, classic, oneyear]
+  paper: [A4, A3]
+  month: [1, 6]
+
+# Skip specific combinations (all keys in an entry must match)
+exclude:
+  - layout: big
+    paper: A3
+    month: 6
+
+# Per-layout options for layouts with custom flags
+layout_options:
+  classic:
+    abbreviate: true
+    brand: "My Brand"
+    color: true
+  column:
+    abbreviate_all: true
+
+# Output path template — {key} placeholders are replaced
+output: "calendars/{layout}_{year}_{month}_{paper}.pdf"
+```
+
+## Matrix expansion
+
+The `matrix` block defines axes of variation. papr computes the **Cartesian product** of all lists, generating one calendar per combination.
+
+**Example:** 4 layouts x 2 paper sizes x 2 months = **16 combinations**.
+
+Values from the matrix override values from `defaults`. Any key not in the matrix falls back to its default.
+
+## Defaults
+
+The `defaults` block sets values that apply to every combination unless overridden by the matrix. Available keys:
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `layout` | string | Layout name |
+| `year` | integer | Calendar year |
+| `month` | integer | Starting month (1–12) |
+| `paper` | string | Paper size |
+| `font` | string | Body font family |
+| `heading_font` | string | Heading font family |
+| `locale` | string | Locale for date formatting |
+| `margin` | float | Page margin in mm |
+
+## Exclude rules
+
+The `exclude` block is a list of filter entries. A combination is skipped if **all keys** in an exclude entry match. Partial matches are not excluded.
+
+```yaml
+exclude:
+  # Only skips big + A3 + month 6 — big + A3 + month 1 is still generated
+  - layout: big
+    paper: A3
+    month: 6
+```
+
+## Layout options
+
+The `layout_options` block applies layout-specific flags to specific layouts:
+
+```yaml
+layout_options:
+  classic:
+    abbreviate: true       # -a flag
+    abbreviate_all: false   # -A flag
+    brand: "My Brand"       # -b flag
+    color: true             # -c flag
+  column:
+    abbreviate: false       # -a flag
+    abbreviate_all: true    # -A flag
+```
+
+These options only apply when the current combination's layout matches the key.
+
+## Template variables
+
+The `output` path supports `{key}` placeholders that are replaced with values from each combination:
+
+| Variable | Source |
+|----------|--------|
+| `{layout}` | Layout name |
+| `{year}` | Calendar year |
+| `{month}` | Starting month |
+| `{paper}` | Paper size |
+| `{font}` | Body font |
+| `{heading_font}` | Heading font |
+| `{locale}` | Locale |
+| `{margin}` | Margin in mm |
+
+Values resolve from the matrix first, then fall back to defaults.
+
+## Output directories
+
+Parent directories in the output path are **created automatically**. You don't need to create them beforehand:
+
+```yaml
+output: "output/2026/{layout}/{paper}/calendar.pdf"
+```
+
+## Error handling
+
+All combinations are attempted even if some fail. At the end, papr prints a summary of successes and failures. The exit code is **non-zero** if any combination failed.
+
+## Complete example
+
+Given this config (4 layouts x 2 papers x 2 months = 16, minus 1 excluded = 15):
+
+```yaml
+defaults:
+  year: 2026
+  font: "Avenir Next"
+
+matrix:
+  layout: [month, big, classic, oneyear]
+  paper: [A4, A3]
+  month: [1, 6]
+
+exclude:
+  - layout: big
+    paper: A3
+    month: 6
+
+output: "calendars/{layout}_{year}_{month}_{paper}.pdf"
+```
+
+Running:
+
+```
+$ papr batch config.yaml
+Matrix expanded to 15 combination(s)
+[1/15] calendars/month_2026_1_A4.pdf ... Written: calendars/month_2026_1_A4.pdf
+[2/15] calendars/month_2026_1_A3.pdf ... Written: calendars/month_2026_1_A3.pdf
+...
+All 15 file(s) generated successfully.
+```

@@ -1,0 +1,61 @@
+# column
+
+Four months in **landscape** orientation, arranged as vertical columns.
+
+```sh
+papr column [OPTIONS]
+```
+
+## Description
+
+The `column` layout renders four consecutive months side by side on a landscape page. Each month occupies one vertical column showing days 1–31 with the weekday name next to each date. Month titles are centered at the top of each column.
+
+A **folding margin** is inserted after day 15, creating extra spacing in the middle of each column. This allows the printed calendar to be folded in half so that both halves are usable.
+
+## Options
+
+In addition to [shared options](/cli-reference#shared-options), `column` accepts:
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-a` | Abbreviate weekday names (e.g., Mon instead of Monday) | off |
+| `-A` | Abbreviate both weekday and month names | off |
+
+### Shared options
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-o, --output <FILE>` | Output file (`.pdf` or `.svg`) | `out.pdf` |
+| `-y, --year <YEAR>` | Calendar year | current year |
+| `-m, --month <MONTH>` | Starting month (1–12) | current month |
+| `-p, --paper <SIZE>` | Paper size | `A4` |
+| `-f, --font <FONT>` | Font family | `Sans` |
+| `-l, --locale <LOCALE>` | Locale for date formatting | `en_US` |
+| `--margin <MM>` | Page margin in millimeters | `5` |
+
+## Folding margin
+
+The extra spacing after day 15 means you can fold the printed sheet in half. Days 1–15 appear on one side, days 16–31 on the other. This is useful for desk stands or binder inserts.
+
+## Examples
+
+```sh
+# First four months of the year
+papr column -o q1.pdf -y 2026 -m 1
+
+# Summer months with abbreviated weekdays
+papr column -o summer.pdf -y 2026 -m 6 -a
+
+# Fully abbreviated (weekdays + months)
+papr column -o q3.pdf -y 2026 -m 7 -A
+
+# Large format
+papr column -o wall.pdf -y 2026 -m 1 -p A3
+
+# SVG output
+papr column -o quarter.svg -y 2026 -m 1
+```
+
+:::tip
+Generate three column pages to cover a full year: `-m 1`, `-m 5`, and `-m 9`.
+:::

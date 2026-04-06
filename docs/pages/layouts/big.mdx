@@ -1,0 +1,50 @@
+# big
+
+Full year on a single **landscape** sheet, with days flowing in rows.
+
+```sh
+papr big [OPTIONS]
+```
+
+## Description
+
+The `big` layout renders 12 months on a single landscape page. Days flow left-to-right in rows of **21 columns**. Month boundaries are marked with colored flag labels (a dark pole with the month name in white text). Weekend cells have a light gray background.
+
+When starting at a month other than January (using `-m`), the calendar spans from the starting month through to the same month the following year, with year-transition labels displayed automatically.
+
+## Options
+
+This layout uses only the [shared options](/cli-reference#shared-options) — no layout-specific flags.
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-o, --output <FILE>` | Output file (`.pdf` or `.svg`) | `out.pdf` |
+| `-y, --year <YEAR>` | Calendar year | current year |
+| `-m, --month <MONTH>` | Starting month (1–12) | current month |
+| `-p, --paper <SIZE>` | Paper size | `A4` |
+| `-f, --font <FONT>` | Font family | `Sans` |
+| `-l, --locale <LOCALE>` | Locale for date formatting | `en_US` |
+| `--margin <MM>` | Page margin in millimeters | `5` |
+
+## Examples
+
+```sh
+# Full year starting January
+papr big -o 2026.pdf -y 2026
+
+# Academic year starting September
+papr big -o academic.pdf -y 2026 -m 9
+
+# Large format poster
+papr big -o poster.pdf -y 2026 -p A1 -f 'Helvetica'
+
+# A3 with custom font
+papr big -o year.pdf -y 2026 -f 'Avenir Next' -p A3
+
+# SVG output
+papr big -o year.svg -y 2026
+```
+
+:::tip
+The `big` layout works best on larger paper sizes (A3 and above) where individual day cells remain readable.
+:::

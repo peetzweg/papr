@@ -4,6 +4,8 @@
 
 Command line tool to generate empty calendar templates to print. Outputs PDF and SVG.
 
+**[Full documentation](https://peetzweg.github.io/papr/)**
+
 ![ScreenShot](demo.jpg)
 
 ## Quick Start
@@ -79,8 +81,6 @@ Commands:
 
 ### Layout-Specific Options
 
-Some layouts accept additional flags that only apply to them:
-
 **`classic` and `column`:**
 
 | Flag | Description |
@@ -119,154 +119,40 @@ papr month -o calendar.svg
 
 ## Layouts
 
-### `month`
+See the [full layout documentation](https://peetzweg.github.io/papr/layouts) for visual examples and detailed descriptions.
 
-Single month on a **portrait** page. The top third is a header with year and month name. The bottom two thirds is a 7-column (Mon-Sun) grid with 6 rows. Week numbers appear on Mondays.
-
-### `big`
-
-Full year on a single **landscape** sheet. Days flow left-to-right in rows of 21 columns. Month boundaries are marked with colored flag labels. Supports starting at any month with year-transition labels.
-
-### `classic`
-
-Two months in **landscape** orientation. Uses a 4-page columnar layout designed for back-to-back printing -- the first month is rotated 180 degrees. Supports brand text, colored numbers, and weekday/month abbreviation.
-
-### `column`
-
-Four months in **landscape**, each in a vertical column. Includes a folding margin after day 15, so the calendar can be folded in half. Supports weekday and month abbreviation.
-
-### `oneyear`
-
-Full year on one **landscape** sheet as 12 mini-columns (one per month). Uses a separate heading font for month titles if provided via a second `-f` flag. Weekday names are shown as single letters.
+| Layout | Orientation | Description |
+|--------|-------------|-------------|
+| [`month`](https://peetzweg.github.io/papr/layouts/month) | Portrait | Single month with header and 7-column grid |
+| [`big`](https://peetzweg.github.io/papr/layouts/big) | Landscape | Full year, days in rows of 21 columns with flag labels |
+| [`classic`](https://peetzweg.github.io/papr/layouts/classic) | Landscape | Two months, designed for back-to-back printing |
+| [`column`](https://peetzweg.github.io/papr/layouts/column) | Landscape | Four months in vertical columns with fold margin |
+| [`oneyear`](https://peetzweg.github.io/papr/layouts/oneyear) | Landscape | Full year as 12 mini-columns |
 
 ![ScreenShot](oneyear_layout.png)
 
 ## Batch Mode
 
-Generate many calendars at once from a single YAML file, using GitHub Actions-style **matrix expansion**:
+Generate many calendars at once from a YAML config file. See the [batch mode documentation](https://peetzweg.github.io/papr/batch-mode) for the full schema and examples.
 
 ```sh
 papr batch config.yaml
 ```
 
-The matrix computes the Cartesian product of all listed values, so every combination is generated. Use `exclude` to skip specific ones.
-
-### YAML Schema
-
 ```yaml
-# Default values applied to every combination
 defaults:
   year: 2026
   font: "Avenir Next"
-  paper: A4
-  margin: 5
 
-# Matrix axes — Cartesian product of all lists
 matrix:
   layout: [month, big, classic, oneyear]
   paper: [A4, A3]
   month: [1, 6]
 
-# Skip specific combinations (all keys in an entry must match)
 exclude:
   - layout: big
     paper: A3
     month: 6
 
-# Per-layout options for layouts with custom flags
-layout_options:
-  classic:
-    abbreviate: true
-    brand: "My Brand"
-    color: true
-  column:
-    abbreviate_all: true
-
-# Output path template — {key} placeholders are replaced
 output: "calendars/{layout}_{year}_{month}_{paper}.pdf"
 ```
-
-### Template Variables
-
-Use `{key}` in the `output` path. Available variables: `layout`, `year`, `month`, `paper`, `font`, `locale`, `margin`. Values come from the matrix combination first, then fall back to `defaults`.
-
-### Batch Error Handling
-
-All combinations are attempted even if some fail. A summary is printed at the end showing successes and failures, and the exit code is non-zero if anything failed.
-
-### Example
-
-Given the YAML above (4 layouts x 2 papers x 2 months = 16, minus 1 excluded = 15):
-
-```
-$ papr batch config.yaml
-Matrix expanded to 15 combination(s)
-[1/15] calendars/month_2026_1_A4.pdf ... Written: calendars/month_2026_1_A4.pdf
-[2/15] calendars/month_2026_1_A3.pdf ... Written: calendars/month_2026_1_A3.pdf
-...
-All 15 file(s) generated successfully.
-```
-
-Output directories are created automatically.
-
-## Architecture
-
-### CLI Design
-
-The CLI uses **subcommands per layout** rather than a single flat argument list. This allows each layout to define its own flags without polluting the global namespace. Shared options (year, month, paper, font, etc.) are defined once in a `SharedArgs` struct and flattened into every subcommand via clap's `#[command(flatten)]`.
-
-This design means adding a new layout-specific option (e.g., `--days-per-row` for `big`) only requires adding a field to that layout's args struct -- no changes to shared code.
-
-### Project Structure
-
-```
-src/
-  main.rs          CLI entry point, subcommand dispatch, render_one()
-  config.rs        Config struct (shared fields), PaperSize, PageSetup
-  batch.rs         YAML batch mode: parsing, matrix expansion, orchestration
-  canvas.rs        Drawing API wrapping Cairo + Pango (PDF/SVG)
-  calendar.rs      Date utilities (day iteration, weekends, month spans)
-  style.rs         Color constants and visual defaults
-  layout/
-    mod.rs         Layout trait definition
-    month.rs       Month layout (portrait, 7-col grid)
-    big.rs         Big layout (landscape, day rows with flags)
-    classic.rs     Classic layout (landscape, 2-month columnar)
-    column.rs      Column layout (landscape, 4-month vertical)
-    oneyear.rs     One-year layout (landscape, 12 mini-columns)
-```
-
-### Rendering Pipeline
-
-1. **CLI parsing** -- clap parses subcommand + args into typed structs
-2. **Config construction** -- `build_config()` resolves paper size, font stack, year/month defaults
-3. **Layout construction** -- layout struct created with any layout-specific options
-4. **Page setup** -- paper dimensions resolved for the layout's orientation (portrait/landscape)
-5. **Canvas creation** -- Cairo surface created (PDF or SVG based on output file extension)
-6. **Drawing** -- `layout.draw()` renders the calendar onto the canvas
-7. **Output** -- canvas drops, surface finishes, file is written
-
-In batch mode, steps 2-7 are repeated for each matrix combination.
-
-### Layout Trait
-
-Every layout implements a simple trait:
-
-```rust
-pub trait Layout {
-    fn orientation(&self) -> Orientation;  // Portrait or Landscape
-    fn draw(&self, canvas: &Canvas, config: &Config, page: &PageSetup);
-}
-```
-
-The `Config` struct carries shared fields (year, month, font, paper, etc.). Layout-specific options are stored as fields on the layout struct itself and accessed via `self` during drawing. This separation keeps `Config` lean and lets each layout own its customization.
-
-### Dependencies
-
-| Crate | Purpose |
-|-------|---------|
-| `cairo-rs` | 2D rendering to PDF and SVG surfaces |
-| `pango` / `pangocairo` | Text layout, shaping, and font handling |
-| `clap` | CLI argument parsing with derive macros |
-| `chrono` | Date calculations (weekdays, leap years, month spans) |
-| `serde` / `serde_yml` | YAML deserialization for batch mode |
