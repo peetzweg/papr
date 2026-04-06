@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## [2.1.0](https://github.com/peetzweg/papr/compare/v2.0.0...v2.1.0) - 2026-04-06
+
+### Added
+
+- add batch mode with matrix expansion and refactor CLI to subcommands
+
+### Fixed
+
+- resolve cargo fmt and clippy CI failures, add pre-commit hook
+- drop x86_64-apple-darwin build, simplify Homebrew formula
+- use macos-14 for x86_64 cross-compile, macos-13 deprecated
+- add workflow_dispatch trigger to binary builds
+- trigger binary builds on tag push instead of release event
+
 ### Added
 
 - **Batch mode** with GitHub Actions-style matrix expansion (`papr batch config.yaml`) (`#51`)
