@@ -19,3 +19,5 @@ pango = "0.21"
 pangocairo = "0.21"
 clap = { version = "4", features = ["derive"] }
 chrono = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_yml = "0.0.12"

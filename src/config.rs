@@ -51,6 +51,22 @@ impl PaperSize {
     }
 }
 
+impl std::fmt::Display for PaperSize {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            PaperSize::A5 => write!(f, "A5"),
+            PaperSize::A4 => write!(f, "A4"),
+            PaperSize::A3 => write!(f, "A3"),
+            PaperSize::A2 => write!(f, "A2"),
+            PaperSize::A1 => write!(f, "A1"),
+            PaperSize::A0 => write!(f, "A0"),
+            PaperSize::UsLetter => write!(f, "USLetter"),
+            PaperSize::UsTabloid => write!(f, "USTabloid"),
+            PaperSize::UsLedger => write!(f, "USLedger"),
+        }
+    }
+}
+
 /// Page orientation.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Orientation {
@@ -89,7 +105,7 @@ impl PageSetup {
     }
 }
 
-/// All user-facing configuration. Immutable after CLI parsing.
+/// Shared configuration fields used by all layouts.
 #[allow(dead_code)]
 pub struct Config {
     pub year: i32,
@@ -100,10 +116,6 @@ pub struct Config {
     pub font: String,
     pub heading_font: Option<String>,
     pub locale: String,
-    pub abbreviate: bool,
-    pub abbreviate_all: bool,
-    pub brand: String,
-    pub color_numbers: bool,
 }
 
 impl Config {

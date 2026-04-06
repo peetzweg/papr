@@ -5,7 +5,10 @@ use crate::canvas::{Canvas, Font};
 use crate::config::{CM, Config, Orientation, PageSetup};
 use crate::style::Color;
 
-pub struct ColumnLayout;
+pub struct ColumnLayout {
+    pub abbreviate: bool,
+    pub abbreviate_all: bool,
+}
 
 impl super::Layout for ColumnLayout {
     fn orientation(&self) -> Orientation {
@@ -27,13 +30,13 @@ impl super::Layout for ColumnLayout {
                     c.translate(col as f64 * column_width, 0.0);
 
                     // Month title
-                    draw_month_title(c, config, page, date, column_width, row_height, font_size);
+                    draw_month_title(c, self, config, page, date, column_width, row_height, font_size);
 
                     // Days
                     let starting_month = date.month();
                     while date.month() == starting_month {
                         draw_day(
-                            c, config, page, date, row_width, row_height, font_size, line_width,
+                            c, self, config, page, date, row_width, row_height, font_size, line_width,
                         );
                         date = date.succ_opt().unwrap();
                     }
@@ -45,6 +48,7 @@ impl super::Layout for ColumnLayout {
 
 fn draw_month_title(
     canvas: &Canvas,
+    layout: &ColumnLayout,
     config: &Config,
     page: &PageSetup,
     date: NaiveDate,
@@ -55,7 +59,7 @@ fn draw_month_title(
     let title_font = Font::new(&config.font, font_size * 2.0);
 
     // Month name — full or abbreviated
-    let month_str = if config.abbreviate_all {
+    let month_str = if layout.abbreviate_all {
         date.format("%b").to_string()
     } else {
         date.format("%B").to_string()
@@ -76,6 +80,7 @@ fn draw_month_title(
 
 fn draw_day(
     canvas: &Canvas,
+    layout: &ColumnLayout,
     config: &Config,
     page: &PageSetup,
     date: NaiveDate,
@@ -117,7 +122,7 @@ fn draw_day(
 
         // Day text: "1 Monday" or "1 Mon"
         let day_font = Font::new(&config.font, font_size);
-        let weekday_str = if config.abbreviate || config.abbreviate_all {
+        let weekday_str = if layout.abbreviate || layout.abbreviate_all {
             date.format("%a").to_string()
         } else {
             date.format("%A").to_string()

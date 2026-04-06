@@ -7,7 +7,12 @@ use crate::canvas::{Canvas, Font};
 use crate::config::{CM, Config, Orientation, PageSetup};
 use crate::style::Color;
 
-pub struct ClassicLayout;
+pub struct ClassicLayout {
+    pub abbreviate: bool,
+    pub abbreviate_all: bool,
+    pub brand: String,
+    pub color_numbers: bool,
+}
 
 impl super::Layout for ClassicLayout {
     fn orientation(&self) -> Orientation {
@@ -30,6 +35,7 @@ impl super::Layout for ClassicLayout {
             c.rotate(PI);
             draw_month(
                 c,
+                self,
                 config,
                 canvas,
                 year_to_draw,
@@ -56,6 +62,7 @@ impl super::Layout for ClassicLayout {
 
             draw_month(
                 c,
+                self,
                 config,
                 canvas,
                 year_to_draw,
@@ -70,11 +77,12 @@ impl super::Layout for ClassicLayout {
         });
 
         // Brand text
-        if !config.brand.is_empty() {
+        if !self.brand.is_empty() {
             canvas.with_save(|c| {
                 draw_brand_text(
                     c,
                     canvas,
+                    self,
                     config,
                     page.width - page_width + page.margin,
                     page.height / 2.0 + 3.0,
@@ -85,6 +93,7 @@ impl super::Layout for ClassicLayout {
                 draw_brand_text(
                     c,
                     canvas,
+                    self,
                     config,
                     page.width - page_width + page.margin,
                     3.0,
@@ -95,15 +104,23 @@ impl super::Layout for ClassicLayout {
     }
 }
 
-fn draw_brand_text(_c: &Canvas, canvas: &Canvas, config: &Config, x: f64, y: f64, font_size: f64) {
-    let parts: Vec<&str> = config.brand.splitn(2, ' ').collect();
+fn draw_brand_text(
+    _c: &Canvas,
+    canvas: &Canvas,
+    layout: &ClassicLayout,
+    config: &Config,
+    x: f64,
+    y: f64,
+    font_size: f64,
+) {
+    let parts: Vec<&str> = layout.brand.splitn(2, ' ').collect();
     if parts.is_empty() {
         return;
     }
 
     // Number part (first word)
     let number_font = Font::new(&config.font, font_size).heavy();
-    let number_color = if config.color_numbers {
+    let number_color = if layout.color_numbers {
         Color::rgb(0.6, 0.0, 0.0)
     } else {
         Color::rgb(0.0, 0.0, 0.0)
@@ -126,6 +143,7 @@ fn draw_brand_text(_c: &Canvas, canvas: &Canvas, config: &Config, x: f64, y: f64
 
 fn draw_month(
     c: &Canvas,
+    layout: &ClassicLayout,
     config: &Config,
     canvas: &Canvas,
     year: i32,
@@ -143,6 +161,7 @@ fn draw_month(
     draw_month_title(
         c,
         canvas,
+        layout,
         config,
         page.margin,
         page.margin,
@@ -164,6 +183,7 @@ fn draw_month(
         draw_day(
             c,
             canvas,
+            layout,
             config,
             x,
             y,
@@ -195,6 +215,7 @@ fn draw_month(
 fn draw_month_title(
     _c: &Canvas,
     canvas: &Canvas,
+    layout: &ClassicLayout,
     config: &Config,
     x: f64,
     y: f64,
@@ -202,7 +223,7 @@ fn draw_month_title(
     cell_height: f64,
     date: NaiveDate,
 ) {
-    let style = if config.abbreviate_all { "%b" } else { "%B" };
+    let style = if layout.abbreviate_all { "%b" } else { "%B" };
     let month_str = date.format(style).to_string();
 
     // Find font size that fits
@@ -227,6 +248,7 @@ fn draw_month_title(
 fn draw_day(
     _c: &Canvas,
     canvas: &Canvas,
+    layout: &ClassicLayout,
     config: &Config,
     x: f64,
     y: f64,
@@ -248,7 +270,7 @@ fn draw_day(
     let offset_x = (font_size * 0.3333).floor();
     let offset_y = (font_size * 0.3333).floor();
 
-    let weekday_str = if config.abbreviate || config.abbreviate_all {
+    let weekday_str = if layout.abbreviate || layout.abbreviate_all {
         date.format("%a").to_string()
     } else {
         date.format("%A").to_string()
@@ -258,7 +280,7 @@ fn draw_day(
 
     // Number
     let number_font = Font::new(&config.font, font_size).heavy();
-    let number_color = if config.color_numbers {
+    let number_color = if layout.color_numbers {
         Color::rgb(0.6, 0.0, 0.0)
     } else {
         Color::rgb(0.0, 0.0, 0.0)
