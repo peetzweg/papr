@@ -128,7 +128,10 @@ enum Commands {
     Batch(BatchArgs),
 }
 
-fn build_config(shared: SharedArgs, today: &NaiveDate) -> Result<Config, Box<dyn std::error::Error>> {
+fn build_config(
+    shared: SharedArgs,
+    today: &NaiveDate,
+) -> Result<Config, Box<dyn std::error::Error>> {
     let paper = PaperSize::from_str(&shared.paper)
         .ok_or_else(|| format!("Unknown paper size: {}", shared.paper))?;
 

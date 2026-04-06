@@ -74,9 +74,9 @@ fn filter_excludes(
         .into_iter()
         .filter(|combo| {
             !excludes.iter().any(|exclude| {
-                exclude.iter().all(|(k, v)| {
-                    combo.get(k).is_some_and(|cv| *cv == value_to_string(v))
-                })
+                exclude
+                    .iter()
+                    .all(|(k, v)| combo.get(k).is_some_and(|cv| *cv == value_to_string(v)))
             })
         })
         .collect()
@@ -295,10 +295,10 @@ pub fn run_batch(path: &str) -> Result<(), Box<dyn std::error::Error>> {
 
     for (i, (layout_name, config, output_path)) in resolved.iter().enumerate() {
         // Create parent directories
-        if let Some(parent) = Path::new(&config.output).parent() {
-            if !parent.as_os_str().is_empty() {
-                std::fs::create_dir_all(parent)?;
-            }
+        if let Some(parent) = Path::new(&config.output).parent()
+            && !parent.as_os_str().is_empty()
+        {
+            std::fs::create_dir_all(parent)?;
         }
 
         let layout_opts = batch.layout_options.get(layout_name.as_str());
@@ -405,22 +405,15 @@ mod tests {
         assert_eq!(combinations.len(), 4);
 
         let mut exclude_entry = HashMap::new();
-        exclude_entry.insert(
-            "layout".to_string(),
-            serde_yml::Value::String("big".into()),
-        );
-        exclude_entry.insert(
-            "paper".to_string(),
-            serde_yml::Value::String("A3".into()),
-        );
+        exclude_entry.insert("layout".to_string(), serde_yml::Value::String("big".into()));
+        exclude_entry.insert("paper".to_string(), serde_yml::Value::String("A3".into()));
 
         let filtered = filter_excludes(combinations, &[exclude_entry]);
         assert_eq!(filtered.len(), 3);
 
         // The excluded combination should not be present
         assert!(!filtered.iter().any(|c| {
-            c.get("layout") == Some(&"big".to_string())
-                && c.get("paper") == Some(&"A3".to_string())
+            c.get("layout") == Some(&"big".to_string()) && c.get("paper") == Some(&"A3".to_string())
         }));
     }
 
@@ -469,9 +462,6 @@ mod tests {
             value_to_string(&serde_yml::Value::Number(serde_yml::Number::from(42))),
             "42"
         );
-        assert_eq!(
-            value_to_string(&serde_yml::Value::Bool(true)),
-            "true"
-        );
+        assert_eq!(value_to_string(&serde_yml::Value::Bool(true)), "true");
     }
 }

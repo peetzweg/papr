@@ -1,0 +1,16 @@
+#!/bin/sh
+# Pre-commit hook: runs the same checks as CI to catch issues before push.
+# Install with: git config core.hooksPath .githooks
+
+set -e
+
+echo "Running cargo fmt --check..."
+cargo fmt --check
+
+echo "Running cargo clippy..."
+cargo clippy -- -D warnings
+
+echo "Running cargo test..."
+cargo test --quiet
+
+echo "All checks passed."

@@ -30,13 +30,23 @@ impl super::Layout for ColumnLayout {
                     c.translate(col as f64 * column_width, 0.0);
 
                     // Month title
-                    draw_month_title(c, self, config, page, date, column_width, row_height, font_size);
+                    draw_month_title(
+                        c,
+                        self,
+                        config,
+                        page,
+                        date,
+                        column_width,
+                        row_height,
+                        font_size,
+                    );
 
                     // Days
                     let starting_month = date.month();
                     while date.month() == starting_month {
                         draw_day(
-                            c, self, config, page, date, row_width, row_height, font_size, line_width,
+                            c, self, config, page, date, row_width, row_height, font_size,
+                            line_width,
                         );
                         date = date.succ_opt().unwrap();
                     }
