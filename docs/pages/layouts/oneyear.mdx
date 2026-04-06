@@ -1,0 +1,61 @@
+# oneyear
+
+Full year on one **landscape** sheet as 12 mini-columns.
+
+```sh
+papr oneyear [OPTIONS]
+```
+
+## Description
+
+The `oneyear` layout renders all 12 months of a year on a single landscape page. Each month is a compact column showing abbreviated month names at the top, day numbers, and single-letter weekday indicators (M, T, W, T, F, S, S). Weekend cells have a light gray background.
+
+Month titles are always uppercase and abbreviated (JAN, FEB, etc.) regardless of locale.
+
+![papr oneyear layout](/oneyear_layout.png)
+
+## Options
+
+This layout uses only the [shared options](/cli-reference#shared-options) — no layout-specific flags.
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-o, --output <FILE>` | Output file (`.pdf` or `.svg`) | `out.pdf` |
+| `-y, --year <YEAR>` | Calendar year | current year |
+| `-m, --month <MONTH>` | Starting month (1–12) | current month |
+| `-p, --paper <SIZE>` | Paper size | `A4` |
+| `-f, --font <FONT>` | Font family (pass twice for heading + body) | `Sans` |
+| `-l, --locale <LOCALE>` | Locale for date formatting | `en_US` |
+| `--margin <MM>` | Page margin in millimeters | `5` |
+
+## Dual-font support
+
+The `oneyear` layout supports separate heading and body fonts. Pass `-f` twice — the **first** value sets the heading font (used for month titles), and the **second** sets the body font (used for day numbers and weekday letters):
+
+```sh
+papr oneyear -f 'Georgia' -f 'Helvetica' -o overview.pdf
+```
+
+If only one `-f` is passed, it's used for everything.
+
+## Examples
+
+```sh
+# Full year overview
+papr oneyear -o 2026.pdf -y 2026
+
+# With separate heading and body fonts
+papr oneyear -o overview.pdf -y 2026 -f 'Georgia' -f 'Helvetica'
+
+# Starting from September (academic year)
+papr oneyear -o academic.pdf -y 2026 -m 9
+
+# SVG output
+papr oneyear -o overview.svg -y 2026
+
+# A3 for better readability
+papr oneyear -o wall.pdf -y 2026 -p A3
+
+# French locale
+papr oneyear -o calendrier.pdf -y 2026 -l fr_FR
+```

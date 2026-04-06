@@ -1,0 +1,36 @@
+# Layouts
+
+papr ships with **5 layouts**, each available as a subcommand. All layouts support [shared options](/cli-reference#shared-options) like paper size, font, year, month, and locale.
+
+## Quick comparison
+
+| Layout | Orientation | Months shown | Extra options |
+|--------|------------|--------------|---------------|
+| [`month`](/layouts/month) | Portrait | 1 | — |
+| [`big`](/layouts/big) | Landscape | 12 | — |
+| [`classic`](/layouts/classic) | Landscape | 2 | abbreviation, brand, color |
+| [`column`](/layouts/column) | Landscape | 4 | abbreviation |
+| [`oneyear`](/layouts/oneyear) | Landscape | 12 | dual-font |
+
+## Visual examples
+
+### month
+
+Single month on a portrait page with a large header and 7-column grid.
+
+![papr month layout demo](/demo.jpg)
+
+### oneyear
+
+Full year as 12 compact mini-columns on a single landscape sheet.
+
+![papr oneyear layout](/oneyear_layout.png)
+
+## Shared behavior
+
+All layouts:
+
+- Accept the same [shared options](/cli-reference#shared-options) (`-o`, `-y`, `-m`, `-p`, `-f`, `-l`, `--margin`)
+- Output to PDF or SVG based on file extension
+- Use weekend highlighting (light gray background for Saturday and Sunday)
+- Respect the configured locale for month and weekday names

@@ -1,0 +1,45 @@
+# Installation
+
+## Homebrew (macOS)
+
+The easiest way to install on macOS:
+
+```sh
+brew tap peetzweg/tap
+brew install papr
+```
+
+## Cargo (from source)
+
+Requires system libraries: **Cairo** and **Pango**.
+
+:::code-group
+
+```sh [macOS]
+brew install pango cairo
+cargo install --git https://github.com/peetzweg/papr
+```
+
+```sh [Debian/Ubuntu]
+sudo apt install libpango1.0-dev libcairo2-dev
+cargo install --git https://github.com/peetzweg/papr
+```
+
+:::
+
+## From source (manual build)
+
+```sh
+git clone https://github.com/peetzweg/papr.git
+cd papr
+cargo build --release
+# Binary at ./target/release/papr
+```
+
+## Verify installation
+
+```sh
+papr --help
+```
+
+You should see the list of available commands and options.

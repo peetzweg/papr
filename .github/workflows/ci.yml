@@ -23,3 +23,21 @@ jobs:
       - run: cargo clippy -- -D warnings
       - run: cargo test
       - run: cargo build --release
+
+      - name: Check CLI help snapshot
+        run: |
+          BIN=./target/release/papr
+          {
+            echo "=== papr ===" && $BIN --help && echo ""
+            echo "=== papr month ===" && $BIN month --help && echo ""
+            echo "=== papr big ===" && $BIN big --help && echo ""
+            echo "=== papr classic ===" && $BIN classic --help && echo ""
+            echo "=== papr column ===" && $BIN column --help && echo ""
+            echo "=== papr oneyear ===" && $BIN oneyear --help && echo ""
+            echo "=== papr batch ===" && $BIN batch --help
+          } > /tmp/help-current.txt
+          diff docs/cli-help-snapshot.txt /tmp/help-current.txt || {
+            echo "::error::CLI --help output has changed. Run the following and update docs accordingly:"
+            echo "  cargo build --release && ./scripts/update-help-snapshot.sh"
+            exit 1
+          }
